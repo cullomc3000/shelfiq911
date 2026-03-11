@@ -1,5 +1,4 @@
-
-      from io import BytesIO
+from io import BytesIO
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -535,4 +534,5 @@ if run_clicked:
         )
 
     except Exception as e:
+
         st.error(f"Analysis failed: {e}")
