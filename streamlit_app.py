@@ -37,11 +37,6 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
     return df
 
-def normalize_text_value(x):
-    if pd.isna(x):
-        return x
-    return str(x).strip()
-
 def normalize_state(x):
     if pd.isna(x):
         return np.nan
@@ -59,13 +54,11 @@ def read_uploaded_table(uploaded_file):
     name = uploaded_file.name.lower()
 
     if name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-        return normalize_columns(df)
+        return normalize_columns(pd.read_csv(uploaded_file))
 
     if name.endswith(".xlsx") or name.endswith(".xls"):
         uploaded_file.seek(0)
-        df = pd.read_excel(uploaded_file, header=0)
-        return normalize_columns(df)
+        return normalize_columns(pd.read_excel(uploaded_file, header=0))
 
     raise ValueError(f"Unsupported file type: {uploaded_file.name}")
 
@@ -95,28 +88,25 @@ def validate_inputs(products, stores, sales_history, shelf=None):
 def prepare_stores(stores: pd.DataFrame) -> pd.DataFrame:
     stores = normalize_columns(stores).copy()
 
-    # Normalize key fields
-    for col in ["store_id", "retailer", "format", "store_name"]:
-        if col in stores.columns:
-            stores[col] = stores[col].apply(normalize_text_value)
+    stores["store_id"] = stores["store_id"].astype(str).str.strip()
+    stores["retailer"] = stores["retailer"].astype(str).str.strip()
 
-    stores["state"] = stores["state"].apply(normalize_state)
-
-    # Auto-assign region from state
-    stores["region"] = stores["state"].map(STATE_TO_REGION)
-
-    # Add default format if missing
     if "format" not in stores.columns:
         stores["format"] = "Unknown"
     else:
-        stores["format"] = stores["format"].fillna("Unknown")
+        stores["format"] = stores["format"].fillna("Unknown").astype(str).str.strip()
+
+    if "store_name" not in stores.columns:
+        stores["store_name"] = np.nan
+
+    stores["state"] = stores["state"].apply(normalize_state)
+    stores["region"] = stores["state"].map(STATE_TO_REGION)
 
     return stores
 
 def run_data_quality_checks(products, stores, sales_history, shelf=None):
     issues = []
 
-    # Normalize
     products = normalize_columns(products).copy()
     stores = normalize_columns(stores).copy()
     sales_history = normalize_columns(sales_history).copy()
@@ -126,7 +116,6 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
     else:
         shelf = pd.DataFrame()
 
-    # Type cleanup
     if "store_id" in stores.columns:
         stores["store_id"] = stores["store_id"].astype(str).str.strip()
     if "sku_id" in products.columns:
@@ -143,24 +132,40 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
     # Missing IDs
     if "store_id" in sales_history.columns:
         missing_store_ids = sales_history["store_id"].isna().sum() + (sales_history["store_id"].astype(str).str.strip() == "").sum()
-        issues.append({"check": "Missing store_id in Sales_History", "status": "Fail" if missing_store_ids > 0 else "Pass", "count": int(missing_store_ids)})
+        issues.append({
+            "check": "Missing store_id in Sales_History",
+            "status": "Fail" if missing_store_ids > 0 else "Pass",
+            "count": int(missing_store_ids)
+        })
 
     if "sku_id" in sales_history.columns:
         missing_sku_ids = sales_history["sku_id"].isna().sum() + (sales_history["sku_id"].astype(str).str.strip() == "").sum()
-        issues.append({"check": "Missing sku_id in Sales_History", "status": "Fail" if missing_sku_ids > 0 else "Pass", "count": int(missing_sku_ids)})
+        issues.append({
+            "check": "Missing sku_id in Sales_History",
+            "status": "Fail" if missing_sku_ids > 0 else "Pass",
+            "count": int(missing_sku_ids)
+        })
 
     # Invalid dates
     if "week_end_date" in sales_history.columns:
         parsed_dates = pd.to_datetime(sales_history["week_end_date"], errors="coerce")
         invalid_dates = parsed_dates.isna().sum()
-        issues.append({"check": "Invalid week_end_date values", "status": "Fail" if invalid_dates > 0 else "Pass", "count": int(invalid_dates)})
+        issues.append({
+            "check": "Invalid week_end_date values",
+            "status": "Fail" if invalid_dates > 0 else "Pass",
+            "count": int(invalid_dates)
+        })
         sales_history["week_end_date"] = parsed_dates
 
     # Negative units
     if "units" in sales_history.columns:
         sales_history["units"] = pd.to_numeric(sales_history["units"], errors="coerce")
         negative_units = (sales_history["units"] < 0).sum()
-        issues.append({"check": "Negative units", "status": "Fail" if negative_units > 0 else "Pass", "count": int(negative_units)})
+        issues.append({
+            "check": "Negative units",
+            "status": "Fail" if negative_units > 0 else "Pass",
+            "count": int(negative_units)
+        })
 
     # Negative sales
     sales_col = None
@@ -172,52 +177,75 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
     if sales_col is not None:
         sales_history[sales_col] = pd.to_numeric(sales_history[sales_col], errors="coerce")
         negative_sales = (sales_history[sales_col] < 0).sum()
-        issues.append({"check": f"Negative {sales_col}", "status": "Fail" if negative_sales > 0 else "Pass", "count": int(negative_sales)})
+        issues.append({
+            "check": f"Negative {sales_col}",
+            "status": "Fail" if negative_sales > 0 else "Pass",
+            "count": int(negative_sales)
+        })
 
     # Duplicates
     dup_cols = [c for c in ["store_id", "sku_id", "week_end_date"] if c in sales_history.columns]
     if len(dup_cols) == 3:
         dup_count = sales_history.duplicated(subset=dup_cols).sum()
-        issues.append({"check": "Duplicate store_id + sku_id + week_end_date rows", "status": "Fail" if dup_count > 0 else "Pass", "count": int(dup_count)})
+        issues.append({
+            "check": "Duplicate store_id + sku_id + week_end_date rows",
+            "status": "Fail" if dup_count > 0 else "Pass",
+            "count": int(dup_count)
+        })
 
-    # Unmatched products
+    # Unmatched SKUs
     if "sku_id" in sales_history.columns and "sku_id" in products.columns:
-        unmatched_skus = ~sales_history["sku_id"].isin(products["sku_id"].astype(str).str.strip())
-        issues.append({"check": "Sales_History sku_id not found in Products", "status": "Fail" if unmatched_skus.sum() > 0 else "Pass", "count": int(unmatched_skus.sum())})
+        unmatched_skus = ~sales_history["sku_id"].isin(products["sku_id"])
+        issues.append({
+            "check": "Sales_History sku_id not found in Products",
+            "status": "Fail" if unmatched_skus.sum() > 0 else "Pass",
+            "count": int(unmatched_skus.sum())
+        })
 
-    # Unmatched stores
+    # Unmatched Stores
     if "store_id" in sales_history.columns and "store_id" in stores.columns:
-        unmatched_stores = ~sales_history["store_id"].isin(stores["store_id"].astype(str).str.strip())
-        issues.append({"check": "Sales_History store_id not found in Stores", "status": "Fail" if unmatched_stores.sum() > 0 else "Pass", "count": int(unmatched_stores.sum())})
+        unmatched_stores = ~sales_history["store_id"].isin(stores["store_id"])
+        issues.append({
+            "check": "Sales_History store_id not found in Stores",
+            "status": "Fail" if unmatched_stores.sum() > 0 else "Pass",
+            "count": int(unmatched_stores.sum())
+        })
 
-    # Invalid states
+    # Invalid state codes
     if "state" in stores.columns:
         invalid_states = ~stores["state"].isin(list(STATE_TO_REGION.keys()))
-        issues.append({"check": "Invalid state codes in Stores", "status": "Fail" if invalid_states.sum() > 0 else "Pass", "count": int(invalid_states.sum())})
+        issues.append({
+            "check": "Invalid state codes in Stores",
+            "status": "Fail" if invalid_states.sum() > 0 else "Pass",
+            "count": int(invalid_states.sum())
+        })
 
-    # Missing regions after auto-map
-    if "state" in stores.columns:
-        auto_regions = stores["state"].map(STATE_TO_REGION)
-        missing_region_map = auto_regions.isna().sum()
-        issues.append({"check": "States that could not be mapped to region", "status": "Fail" if missing_region_map > 0 else "Pass", "count": int(missing_region_map)})
-
-    # Missing weeks by store/sku (simple check)
-    if {"store_id", "sku_id", "week_end_date"}.issubset(sales_history.columns):
-        counts = sales_history.groupby(["store_id", "sku_id"])["week_end_date"].nunique().reset_index(name="week_count")
-        sparse_pairs = (counts["week_count"] < counts["week_count"].median()).sum() if len(counts) else 0
-        issues.append({"check": "Store/SKU pairs with below-median week coverage", "status": "Warn" if sparse_pairs > 0 else "Pass", "count": int(sparse_pairs)})
+        missing_region_map = stores["state"].map(STATE_TO_REGION).isna().sum()
+        issues.append({
+            "check": "States that could not be mapped to region",
+            "status": "Fail" if missing_region_map > 0 else "Pass",
+            "count": int(missing_region_map)
+        })
 
     # Shelf checks
     if len(shelf) > 0:
         if "shelf_share" in shelf.columns:
             shelf["shelf_share"] = pd.to_numeric(shelf["shelf_share"], errors="coerce")
             bad_shelf_share = ((shelf["shelf_share"] < 0) | (shelf["shelf_share"] > 1)).sum()
-            issues.append({"check": "Shelf_Snapshot shelf_share outside 0 to 1", "status": "Fail" if bad_shelf_share > 0 else "Pass", "count": int(bad_shelf_share)})
+            issues.append({
+                "check": "Shelf_Snapshot shelf_share outside 0 to 1",
+                "status": "Fail" if bad_shelf_share > 0 else "Pass",
+                "count": int(bad_shelf_share)
+            })
 
         if "facings" in shelf.columns:
             shelf["facings"] = pd.to_numeric(shelf["facings"], errors="coerce")
             bad_facings = (shelf["facings"] < 0).sum()
-            issues.append({"check": "Negative facings in Shelf_Snapshot", "status": "Fail" if bad_facings > 0 else "Pass", "count": int(bad_facings)})
+            issues.append({
+                "check": "Negative facings in Shelf_Snapshot",
+                "status": "Fail" if bad_facings > 0 else "Pass",
+                "count": int(bad_facings)
+            })
 
     return pd.DataFrame(issues)
 
@@ -225,8 +253,8 @@ def run_analysis(products, stores, sales_history, shelf=None):
     products = normalize_columns(products).copy()
     sales_history = normalize_columns(sales_history).copy()
 
-    # Normalize text keys
     products["sku_id"] = products["sku_id"].astype(str).str.strip()
+
     if "brand" not in products.columns:
         products["brand"] = "Unknown"
     else:
@@ -238,7 +266,6 @@ def run_analysis(products, stores, sales_history, shelf=None):
         products["category"] = products["category"].fillna("Unknown")
 
     stores = prepare_stores(stores)
-    stores["store_id"] = stores["store_id"].astype(str).str.strip()
 
     sales_history["store_id"] = sales_history["store_id"].astype(str).str.strip()
     sales_history["sku_id"] = sales_history["sku_id"].astype(str).str.strip()
@@ -265,7 +292,6 @@ def run_analysis(products, stores, sales_history, shelf=None):
         if "shelf_share" in shelf.columns:
             shelf["shelf_share"] = pd.to_numeric(shelf["shelf_share"], errors="coerce").fillna(0)
 
-    # Join data
     sales_enriched = (
         sales_history
         .merge(products, on="sku_id", how="left")
@@ -278,7 +304,6 @@ def run_analysis(products, stores, sales_history, shelf=None):
         else:
             sales_enriched[col] = sales_enriched[col].fillna("Unknown")
 
-    # Current max week
     current_max_week = sales_enriched["week_end_date"].max()
     if pd.isna(current_max_week):
         raise ValueError("No valid dates found in Sales_History.")
@@ -292,9 +317,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     weeks_13 = max(sales_13w["week_end_date"].nunique(), 1)
     weeks_52 = max(sales_52w["week_end_date"].nunique(), 1)
 
-    # =========================================================
-    # SKU Velocity (13W)
-    # =========================================================
+    # SKU Velocity
     sku_velocity = (
         sales_13w
         .groupby(["sku_id", "brand", "category"], dropna=False)
@@ -326,9 +349,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     ) * 100
     sku_velocity["sku_velocity_index"] = sku_velocity["sku_velocity_index"].fillna(0)
 
-    # =========================================================
-    # Store Performance Index (13W)
-    # =========================================================
+    # Store Performance Index
     store_totals = (
         sales_13w
         .groupby(["store_id", "retailer", "region", "state", "format"], dropna=False)
@@ -364,9 +385,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
         .reset_index(drop=True)
     )
 
-    # =========================================================
-    # Distribution Gap (13W)
-    # =========================================================
+    # Distribution Gap
     carried = (
         sales_13w
         .groupby(["brand", "category", "retailer", "store_id"], dropna=False)
@@ -402,9 +421,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     ) * 100
     brand_distribution["distribution_gap_index"] = brand_distribution["distribution_gap_index"].fillna(0)
 
-    # =========================================================
     # Revenue Opportunity
-    # =========================================================
     store_opportunity = store_perf[[
         "store_id", "retailer", "region", "state", "format",
         "actual_sales", "expected_sales", "sales_gap", "store_performance_index"
@@ -416,9 +433,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
         0
     )
 
-    # =========================================================
     # Recent SKU Declines
-    # =========================================================
     sku_declines = (
         sales_enriched
         .groupby(["sku_id", "brand", "category", "week_end_date"], dropna=False)
@@ -440,9 +455,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
         .reset_index(drop=True)
     )
 
-    # =========================================================
     # Shelf Productivity
-    # =========================================================
     if len(shelf) > 0 and {"store_id", "sku_id"}.issubset(shelf.columns):
         if "facings" not in shelf.columns:
             shelf["facings"] = np.nan
@@ -471,9 +484,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     else:
         shelf_metrics = pd.DataFrame()
 
-    # =========================================================
     # YoY Growth
-    # =========================================================
     sales_enriched["year"] = sales_enriched["week_end_date"].dt.year
 
     yearly_sku = (
@@ -518,9 +529,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
             np.nan
         )
 
-    # =========================================================
-    # Momentum (13W vs 52W)
-    # =========================================================
+    # Momentum
     velocity_13w = (
         sales_13w
         .groupby(["sku_id"], dropna=False)
@@ -567,9 +576,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
         default="Stable"
     )
 
-    # =========================================================
     # Health Summary
-    # =========================================================
     underperf_rate = float(store_perf["underperforming_flag"].mean()) if len(store_perf) else 0
     avg_spi = float(store_perf["store_performance_index"].fillna(100).mean()) if len(store_perf) else 100
     dist_gap_rate = float(brand_distribution["distribution_gap_index"].fillna(0).mean()) if len(brand_distribution) else 0
