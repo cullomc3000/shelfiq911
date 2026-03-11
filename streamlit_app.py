@@ -1,85 +1,96 @@
-from pathlib import Path
-from io import BytesIO
+
+      from io import BytesIO
 import pandas as pd
 import numpy as np
 import streamlit as st
 
 st.set_page_config(page_title="ShelfIQ 911", layout="wide")
 
-# ==========================================
+# =========================================================
 # Helpers
-# ==========================================
+# =========================================================
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
     return df
 
-def read_uploaded_table(uploaded_file, sheet_name=None):
+def read_excel_sheet(uploaded_file, sheet_name: str) -> pd.DataFrame:
+    uploaded_file.seek(0)
+    df = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=0)
+    return normalize_columns(df)
+
+def read_uploaded_table(uploaded_file):
     if uploaded_file is None:
         return None
 
     name = uploaded_file.name.lower()
 
     if name.endswith(".csv"):
-        return pd.read_csv(uploaded_file)
+        df = pd.read_csv(uploaded_file)
+        return normalize_columns(df)
 
     if name.endswith(".xlsx") or name.endswith(".xls"):
-        return pd.read_excel(uploaded_file, sheet_name=sheet_name)
+        uploaded_file.seek(0)
+        df = pd.read_excel(uploaded_file, header=0)
+        return normalize_columns(df)
 
     raise ValueError(f"Unsupported file type: {uploaded_file.name}")
+
+def validate_inputs(products, stores, sales, shelf=None):
+    required_product_cols = {"sku_id"}
+    required_store_cols = {"store_id", "format", "retailer", "region", "state"}
+    required_sales_cols = {"store_id", "sku_id", "week_end_date", "units"}
+
+    missing = {}
+
+    if not required_product_cols.issubset(products.columns):
+        missing["Products"] = sorted(list(required_product_cols - set(products.columns)))
+
+    if not required_store_cols.issubset(stores.columns):
+        missing["Stores"] = sorted(list(required_store_cols - set(stores.columns)))
+
+    if not required_sales_cols.issubset(sales.columns):
+        missing["Sales_13W"] = sorted(list(required_sales_cols - set(sales.columns)))
+
+    if shelf is not None and len(shelf) > 0:
+        required_shelf_cols = {"store_id", "sku_id", "facings", "shelf_share"}
+        if not required_shelf_cols.issubset(shelf.columns):
+            missing["Shelf_Snapshot"] = sorted(list(required_shelf_cols - set(shelf.columns)))
+
+    return missing
 
 def run_analysis(products, stores, sales, shelf=None):
     products = normalize_columns(products)
     stores = normalize_columns(stores)
     sales = normalize_columns(sales)
 
-    if shelf is not None:
-        shelf = normalize_columns(shelf)
-    else:
+    if shelf is None:
         shelf = pd.DataFrame(columns=["store_id", "sku_id", "facings", "shelf_share"])
+    else:
+        shelf = normalize_columns(shelf)
 
-    required_product_cols = {"sku_id"}
-    required_store_cols = {"store_id", "retailer", "region", "state", "format"}
-    required_sales_cols = {"week_end_date", "store_id", "sku_id", "units"}
-
-    missing = {}
-
-    if not required_product_cols.issubset(products.columns):
-        missing["Products"] = list(required_product_cols - set(products.columns))
-
-    if not required_store_cols.issubset(stores.columns):
-        missing["Stores"] = list(required_store_cols - set(stores.columns))
-
-    if not required_sales_cols.issubset(sales.columns):
-        missing["Sales_13W"] = list(required_sales_cols - set(sales.columns))
-
+    missing = validate_inputs(products, stores, sales, shelf if len(shelf) > 0 else None)
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
+    # Clean types
     sales["week_end_date"] = pd.to_datetime(sales["week_end_date"], errors="coerce")
+    sales["units"] = pd.to_numeric(sales["units"], errors="coerce").fillna(0)
 
-    for col in ["units", "sales_dollars", "sales"]:
-        if col in sales.columns:
-            sales[col] = pd.to_numeric(sales[col], errors="coerce")
-
-    if "sales_dollars" not in sales.columns:
-        if "sales" in sales.columns:
-            sales["sales_dollars"] = sales["sales"]
-        else:
-            raise ValueError("Sales file must contain either 'sales_dollars' or 'sales'.")
-
-    sales["units"] = sales["units"].fillna(0)
-    sales["sales_dollars"] = sales["sales_dollars"].fillna(0)
+    if "sales_dollars" in sales.columns:
+        sales["sales_dollars"] = pd.to_numeric(sales["sales_dollars"], errors="coerce").fillna(0)
+    elif "sales" in sales.columns:
+        sales["sales_dollars"] = pd.to_numeric(sales["sales"], errors="coerce").fillna(0)
+    else:
+        sales["sales_dollars"] = 0
 
     if len(shelf) > 0:
-        for col in ["facings", "shelf_share"]:
-            if col in shelf.columns:
-                shelf[col] = pd.to_numeric(shelf[col], errors="coerce")
-        if "facings" not in shelf.columns:
-            shelf["facings"] = np.nan
-        if "shelf_share" not in shelf.columns:
-            shelf["shelf_share"] = np.nan
+        if "facings" in shelf.columns:
+            shelf["facings"] = pd.to_numeric(shelf["facings"], errors="coerce").fillna(0)
+        if "shelf_share" in shelf.columns:
+            shelf["shelf_share"] = pd.to_numeric(shelf["shelf_share"], errors="coerce").fillna(0)
 
+    # Merge
     sales_enriched = (
         sales
         .merge(products, on="sku_id", how="left")
@@ -92,7 +103,7 @@ def run_analysis(products, stores, sales, shelf=None):
         else:
             sales_enriched[col] = sales_enriched[col].fillna("Unknown")
 
-    for col in ["retailer", "region", "state", "format"]:
+    for col in ["format", "retailer", "region", "state"]:
         if col not in sales_enriched.columns:
             sales_enriched[col] = "Unknown"
         else:
@@ -100,7 +111,9 @@ def run_analysis(products, stores, sales, shelf=None):
 
     weeks = max(sales_enriched["week_end_date"].nunique(), 1)
 
-    # SKU Velocity
+    # =========================================================
+    # 1. SKU Velocity
+    # =========================================================
     sku_velocity = (
         sales_enriched
         .groupby(["sku_id", "brand", "category"], dropna=False)
@@ -119,7 +132,8 @@ def run_analysis(products, stores, sales, shelf=None):
     )
 
     category_avg_velocity = (
-        sku_velocity.groupby("category", dropna=False)["velocity_units_per_store_per_week"]
+        sku_velocity
+        .groupby("category", dropna=False)["velocity_units_per_store_per_week"]
         .mean()
         .rename("category_avg_velocity")
         .reset_index()
@@ -132,7 +146,9 @@ def run_analysis(products, stores, sales, shelf=None):
     ) * 100
     sku_velocity["sku_velocity_index"] = sku_velocity["sku_velocity_index"].fillna(0)
 
-    # Store Performance
+    # =========================================================
+    # 2. Store Performance Index
+    # =========================================================
     store_totals = (
         sales_enriched
         .groupby(["store_id", "retailer", "region", "state", "format"], dropna=False)
@@ -152,12 +168,7 @@ def run_analysis(products, stores, sales, shelf=None):
         .reset_index()
     )
 
-    store_perf = store_totals.merge(
-        peer_avg,
-        on=["retailer", "format", "region"],
-        how="left"
-    )
-
+    store_perf = store_totals.merge(peer_avg, on=["retailer", "format", "region"], how="left")
     store_perf["expected_sales"] = store_perf["expected_sales"].fillna(store_perf["actual_sales"].mean())
     store_perf["store_performance_index"] = (
         store_perf["actual_sales"] /
@@ -167,7 +178,15 @@ def run_analysis(products, stores, sales, shelf=None):
     store_perf["sales_gap"] = store_perf["expected_sales"] - store_perf["actual_sales"]
     store_perf["underperforming_flag"] = store_perf["store_performance_index"] < 80
 
-    # Distribution Gap
+    underperforming_stores = (
+        store_perf[store_perf["underperforming_flag"]]
+        .sort_values(["sales_gap", "store_performance_index"], ascending=[False, True])
+        .reset_index(drop=True)
+    )
+
+    # =========================================================
+    # 3. Distribution Gap
+    # =========================================================
     carried = (
         sales_enriched
         .groupby(["brand", "category", "retailer", "store_id"], dropna=False)
@@ -177,7 +196,8 @@ def run_analysis(products, stores, sales, shelf=None):
     carried = carried[carried["total_units"] > 0]
 
     retailer_store_universe = (
-        stores.groupby("retailer", dropna=False)["store_id"]
+        stores
+        .groupby("retailer", dropna=False)["store_id"]
         .nunique()
         .rename("retailer_store_universe")
         .reset_index()
@@ -202,7 +222,9 @@ def run_analysis(products, stores, sales, shelf=None):
     ) * 100
     brand_distribution["distribution_gap_index"] = brand_distribution["distribution_gap_index"].fillna(0)
 
-    # Revenue Opportunity
+    # =========================================================
+    # 4. Revenue Opportunity
+    # =========================================================
     store_opportunity = store_perf[[
         "store_id", "retailer", "region", "state", "format",
         "actual_sales", "expected_sales", "sales_gap", "store_performance_index"
@@ -214,14 +236,9 @@ def run_analysis(products, stores, sales, shelf=None):
         0
     )
 
-    # Underperforming stores
-    underperforming_stores = (
-        store_perf[store_perf["underperforming_flag"]]
-        .sort_values(["sales_gap", "store_performance_index"], ascending=[False, True])
-        .reset_index(drop=True)
-    )
-
-    # SKU declines
+    # =========================================================
+    # 5. Recent SKU Declines
+    # =========================================================
     sku_declines = (
         sales_enriched
         .groupby(["sku_id", "brand", "category", "week_end_date"], dropna=False)
@@ -243,14 +260,15 @@ def run_analysis(products, stores, sales, shelf=None):
         .reset_index(drop=True)
     )
 
-    # Shelf productivity
-    if len(shelf) > 0 and {"store_id", "sku_id", "facings"}.issubset(shelf.columns):
+    # =========================================================
+    # 6. Shelf Productivity
+    # =========================================================
+    if len(shelf) > 0 and {"store_id", "sku_id", "facings", "shelf_share"}.issubset(shelf.columns):
         shelf_metrics = (
             shelf
             .merge(products, on="sku_id", how="left")
             .merge(
-                sales_enriched
-                .groupby(["store_id", "sku_id"], dropna=False)
+                sales_enriched.groupby(["store_id", "sku_id"], dropna=False)
                 .agg(total_sales=("sales_dollars", "sum"), total_units=("units", "sum"))
                 .reset_index(),
                 on=["store_id", "sku_id"],
@@ -266,6 +284,9 @@ def run_analysis(products, stores, sales, shelf=None):
     else:
         shelf_metrics = pd.DataFrame()
 
+    # =========================================================
+    # 7. Health Summary
+    # =========================================================
     underperf_rate = float(store_perf["underperforming_flag"].mean()) if len(store_perf) else 0
     avg_spi = float(store_perf["store_performance_index"].fillna(100).mean()) if len(store_perf) else 100
     dist_gap_rate = float(brand_distribution["distribution_gap_index"].fillna(0).mean()) if len(brand_distribution) else 0
@@ -300,14 +321,15 @@ def to_excel_download(results_dict):
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         for name, df in results_dict.items():
-            sheet_name = name[:31]
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
+            if df is None or len(df) == 0:
+                continue
+            df.to_excel(writer, sheet_name=name[:31], index=False)
     output.seek(0)
     return output
 
-# ==========================================
-# App UI
-# ==========================================
+# =========================================================
+# App
+# =========================================================
 st.title("ShelfIQ 911")
 st.caption("Upload retail data, run analysis, and download results")
 
@@ -317,7 +339,10 @@ upload_mode = st.radio(
     horizontal=True
 )
 
-products = stores = sales = shelf = None
+products = None
+stores = None
+sales = None
+shelf = None
 
 if upload_mode == "One Excel workbook":
     workbook = st.file_uploader(
@@ -327,19 +352,24 @@ if upload_mode == "One Excel workbook":
 
     if workbook is not None:
         try:
-            products = pd.read_excel(workbook, sheet_name="Products")
-            workbook.seek(0)
-            stores = pd.read_excel(workbook, sheet_name="Stores")
-            workbook.seek(0)
-            sales = pd.read_excel(workbook, sheet_name="Sales_13W")
+            products = read_excel_sheet(workbook, "Products")
+            stores = read_excel_sheet(workbook, "Stores")
+            sales = read_excel_sheet(workbook, "Sales_13W")
 
             try:
-                workbook.seek(0)
-                shelf = pd.read_excel(workbook, sheet_name="Shelf_Snapshot")
+                shelf = read_excel_sheet(workbook, "Shelf_Snapshot")
             except Exception:
                 shelf = None
 
             st.success("Workbook loaded successfully.")
+
+            with st.expander("Preview detected columns"):
+                st.write("Products:", list(products.columns))
+                st.write("Stores:", list(stores.columns))
+                st.write("Sales_13W:", list(sales.columns))
+                if shelf is not None:
+                    st.write("Shelf_Snapshot:", list(shelf.columns))
+
         except Exception as e:
             st.error(f"Could not read workbook: {e}")
 
@@ -370,7 +400,7 @@ run_clicked = st.button("Run ShelfIQ 911 Analysis", type="primary")
 
 if run_clicked:
     if products is None or stores is None or sales is None:
-        st.error("Please provide Products, Stores, and Sales data.")
+        st.error("Please provide Products, Stores, and Sales_13W data.")
         st.stop()
 
     try:
@@ -470,7 +500,7 @@ if run_clicked:
             )
 
         with tabs[4]:
-            if len(shelf_df) == 0:
+            if shelf_df is None or len(shelf_df) == 0:
                 st.warning("No shelf file was uploaded, so shelf productivity was not calculated.")
             else:
                 cols = [c for c in [
