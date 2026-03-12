@@ -2,6 +2,7 @@ from io import BytesIO
 import pandas as pd
 import numpy as np
 import streamlit as st
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="ShelfIQ 911", layout="wide")
 
@@ -129,40 +130,35 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
     if "state" in stores.columns:
         stores["state"] = stores["state"].apply(normalize_state)
 
+    def add_issue(check, status, count, severity_weight):
+        issues.append({
+            "check": check,
+            "status": status,
+            "count": int(count),
+            "severity_weight": severity_weight
+        })
+
+    # Missing IDs
     if "store_id" in sales_history.columns:
         missing_store_ids = sales_history["store_id"].isna().sum() + (sales_history["store_id"].astype(str).str.strip() == "").sum()
-        issues.append({
-            "check": "Missing store_id in Sales_History",
-            "status": "Fail" if missing_store_ids > 0 else "Pass",
-            "count": int(missing_store_ids)
-        })
+        add_issue("Missing store_id in Sales_History", "Fail" if missing_store_ids > 0 else "Pass", missing_store_ids, 8)
 
     if "sku_id" in sales_history.columns:
         missing_sku_ids = sales_history["sku_id"].isna().sum() + (sales_history["sku_id"].astype(str).str.strip() == "").sum()
-        issues.append({
-            "check": "Missing sku_id in Sales_History",
-            "status": "Fail" if missing_sku_ids > 0 else "Pass",
-            "count": int(missing_sku_ids)
-        })
+        add_issue("Missing sku_id in Sales_History", "Fail" if missing_sku_ids > 0 else "Pass", missing_sku_ids, 8)
 
+    # Dates
     if "week_end_date" in sales_history.columns:
         parsed_dates = pd.to_datetime(sales_history["week_end_date"], errors="coerce")
         invalid_dates = parsed_dates.isna().sum()
-        issues.append({
-            "check": "Invalid week_end_date values",
-            "status": "Fail" if invalid_dates > 0 else "Pass",
-            "count": int(invalid_dates)
-        })
+        add_issue("Invalid week_end_date values", "Fail" if invalid_dates > 0 else "Pass", invalid_dates, 7)
         sales_history["week_end_date"] = parsed_dates
 
+    # Negatives
     if "units" in sales_history.columns:
         sales_history["units"] = pd.to_numeric(sales_history["units"], errors="coerce")
         negative_units = (sales_history["units"] < 0).sum()
-        issues.append({
-            "check": "Negative units",
-            "status": "Fail" if negative_units > 0 else "Pass",
-            "count": int(negative_units)
-        })
+        add_issue("Negative units", "Fail" if negative_units > 0 else "Pass", negative_units, 7)
 
     sales_col = None
     if "sales_dollars" in sales_history.columns:
@@ -173,72 +169,116 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
     if sales_col is not None:
         sales_history[sales_col] = pd.to_numeric(sales_history[sales_col], errors="coerce")
         negative_sales = (sales_history[sales_col] < 0).sum()
-        issues.append({
-            "check": f"Negative {sales_col}",
-            "status": "Fail" if negative_sales > 0 else "Pass",
-            "count": int(negative_sales)
-        })
+        add_issue(f"Negative {sales_col}", "Fail" if negative_sales > 0 else "Pass", negative_sales, 7)
 
+    # Duplicates
     dup_cols = [c for c in ["store_id", "sku_id", "week_end_date"] if c in sales_history.columns]
     if len(dup_cols) == 3:
         dup_count = sales_history.duplicated(subset=dup_cols).sum()
-        issues.append({
-            "check": "Duplicate store_id + sku_id + week_end_date rows",
-            "status": "Fail" if dup_count > 0 else "Pass",
-            "count": int(dup_count)
-        })
+        add_issue("Duplicate store_id + sku_id + week_end_date rows", "Fail" if dup_count > 0 else "Pass", dup_count, 6)
 
+    # Unmatched
     if "sku_id" in sales_history.columns and "sku_id" in products.columns:
         unmatched_skus = ~sales_history["sku_id"].isin(products["sku_id"])
-        issues.append({
-            "check": "Sales_History sku_id not found in Products",
-            "status": "Fail" if unmatched_skus.sum() > 0 else "Pass",
-            "count": int(unmatched_skus.sum())
-        })
+        add_issue("Sales_History sku_id not found in Products", "Fail" if unmatched_skus.sum() > 0 else "Pass", unmatched_skus.sum(), 6)
 
     if "store_id" in sales_history.columns and "store_id" in stores.columns:
         unmatched_stores = ~sales_history["store_id"].isin(stores["store_id"])
-        issues.append({
-            "check": "Sales_History store_id not found in Stores",
-            "status": "Fail" if unmatched_stores.sum() > 0 else "Pass",
-            "count": int(unmatched_stores.sum())
-        })
+        add_issue("Sales_History store_id not found in Stores", "Fail" if unmatched_stores.sum() > 0 else "Pass", unmatched_stores.sum(), 6)
 
+    # States
     if "state" in stores.columns:
         invalid_states = ~stores["state"].isin(list(STATE_TO_REGION.keys()))
-        issues.append({
-            "check": "Invalid state codes in Stores",
-            "status": "Fail" if invalid_states.sum() > 0 else "Pass",
-            "count": int(invalid_states.sum())
-        })
+        add_issue("Invalid state codes in Stores", "Fail" if invalid_states.sum() > 0 else "Pass", invalid_states.sum(), 5)
 
         missing_region_map = stores["state"].map(STATE_TO_REGION).isna().sum()
-        issues.append({
-            "check": "States that could not be mapped to region",
-            "status": "Fail" if missing_region_map > 0 else "Pass",
-            "count": int(missing_region_map)
-        })
+        add_issue("States that could not be mapped to region", "Fail" if missing_region_map > 0 else "Pass", missing_region_map, 5)
 
+    # Sparse week coverage
+    if {"store_id", "sku_id", "week_end_date"}.issubset(sales_history.columns):
+        counts = sales_history.groupby(["store_id", "sku_id"])["week_end_date"].nunique().reset_index(name="week_count")
+        sparse_pairs = (counts["week_count"] < counts["week_count"].median()).sum() if len(counts) else 0
+        add_issue("Store/SKU pairs with below-median week coverage", "Warn" if sparse_pairs > 0 else "Pass", sparse_pairs, 2)
+
+    # Shelf
     if len(shelf) > 0:
         if "shelf_share" in shelf.columns:
             shelf["shelf_share"] = pd.to_numeric(shelf["shelf_share"], errors="coerce")
             bad_shelf_share = ((shelf["shelf_share"] < 0) | (shelf["shelf_share"] > 1)).sum()
-            issues.append({
-                "check": "Shelf_Snapshot shelf_share outside 0 to 1",
-                "status": "Fail" if bad_shelf_share > 0 else "Pass",
-                "count": int(bad_shelf_share)
-            })
+            add_issue("Shelf_Snapshot shelf_share outside 0 to 1", "Fail" if bad_shelf_share > 0 else "Pass", bad_shelf_share, 5)
 
         if "facings" in shelf.columns:
             shelf["facings"] = pd.to_numeric(shelf["facings"], errors="coerce")
             bad_facings = (shelf["facings"] < 0).sum()
-            issues.append({
-                "check": "Negative facings in Shelf_Snapshot",
-                "status": "Fail" if bad_facings > 0 else "Pass",
-                "count": int(bad_facings)
-            })
+            add_issue("Negative facings in Shelf_Snapshot", "Fail" if bad_facings > 0 else "Pass", bad_facings, 5)
 
-    return pd.DataFrame(issues)
+    quality = pd.DataFrame(issues)
+
+    # Score
+    if len(quality):
+        penalty = 0
+        for _, row in quality.iterrows():
+            if row["status"] == "Fail":
+                penalty += min(row["count"], 10) * row["severity_weight"]
+            elif row["status"] == "Warn":
+                penalty += min(row["count"], 10) * row["severity_weight"] * 0.35
+        quality_score = max(0, round(100 - penalty, 1))
+    else:
+        quality_score = 100.0
+
+    return quality, quality_score
+
+def build_recommendations(underperf, dist, yoy, momentum):
+    recommendations = []
+
+    if len(underperf):
+        row = underperf.sort_values("sales_gap", ascending=False).iloc[0]
+        recommendations.append(
+            f"Investigate store {row['store_id']} at {row['retailer']} in {row['region']}: "
+            f"sales gap is ${row['sales_gap']:,.0f} and SPI is {row['store_performance_index']:.1f}."
+        )
+
+    if len(dist):
+        row = dist.sort_values("distribution_gap_count", ascending=False).iloc[0]
+        recommendations.append(
+            f"Expand distribution for {row['brand']} / {row['category']} at {row['retailer']}: "
+            f"gap of {int(row['distribution_gap_count'])} stores."
+        )
+
+    if len(yoy):
+        yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"])
+        if len(yoy_clean):
+            top = yoy_clean.sort_values("yoy_sales_growth_pct", ascending=False).iloc[0]
+            recommendations.append(
+                f"Protect and expand SKU {top['sku_id']} ({top['brand']}): "
+                f"YoY sales growth is {top['yoy_sales_growth_pct']:.1f}%."
+            )
+
+            bottom = yoy_clean.sort_values("yoy_sales_growth_pct", ascending=True).iloc[0]
+            recommendations.append(
+                f"Review SKU {bottom['sku_id']} ({bottom['brand']}): "
+                f"YoY sales growth is {bottom['yoy_sales_growth_pct']:.1f}%."
+            )
+
+    if len(momentum):
+        up = momentum[momentum["momentum_flag"] == "Trending Up"]
+        down = momentum[momentum["momentum_flag"] == "Trending Down"]
+
+        if len(up):
+            row = up.sort_values("momentum_ratio", ascending=False).iloc[0]
+            recommendations.append(
+                f"Increase focus on momentum winner {row['sku_id']} ({row['brand']}): "
+                f"momentum ratio is {row['momentum_ratio']:.2f}."
+            )
+
+        if len(down):
+            row = down.sort_values("momentum_ratio", ascending=True).iloc[0]
+            recommendations.append(
+                f"Diagnose decline for {row['sku_id']} ({row['brand']}): "
+                f"momentum ratio is {row['momentum_ratio']:.2f}."
+            )
+
+    return pd.DataFrame({"recommended_action": recommendations[:6]})
 
 def run_analysis(products, stores, sales_history, shelf=None):
     products = normalize_columns(products).copy()
@@ -308,6 +348,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     weeks_13 = max(sales_13w["week_end_date"].nunique(), 1)
     weeks_52 = max(sales_52w["week_end_date"].nunique(), 1)
 
+    # SKU Velocity
     sku_velocity = (
         sales_13w
         .groupby(["sku_id", "brand", "category"], dropna=False)
@@ -339,6 +380,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     ) * 100
     sku_velocity["sku_velocity_index"] = sku_velocity["sku_velocity_index"].fillna(0)
 
+    # Store Performance
     store_totals = (
         sales_13w
         .groupby(["store_id", "retailer", "region", "state", "format"], dropna=False)
@@ -368,12 +410,51 @@ def run_analysis(products, stores, sales_history, shelf=None):
     store_perf["sales_gap"] = store_perf["expected_sales"] - store_perf["actual_sales"]
     store_perf["underperforming_flag"] = store_perf["store_performance_index"] < 80
 
+    # Smarter Revenue Opportunity
+    overall_gap = np.where(store_perf["sales_gap"] > 0, store_perf["sales_gap"], 0)
+
+    retailer_avg_spi = (
+        store_perf.groupby("retailer", dropna=False)["store_performance_index"]
+        .mean()
+        .rename("retailer_avg_spi")
+        .reset_index()
+    )
+    store_perf = store_perf.merge(retailer_avg_spi, on="retailer", how="left")
+
+    # Confidence factor based on how far below expectation and retailer context
+    store_perf["opportunity_confidence"] = np.select(
+        [
+            (store_perf["store_performance_index"] < 70),
+            (store_perf["store_performance_index"] >= 70) & (store_perf["store_performance_index"] < 85),
+        ],
+        [1.00, 0.70],
+        default=0.40
+    )
+
+    # Only count meaningful gaps
+    store_perf["revenue_opportunity_score"] = np.where(
+        (store_perf["sales_gap"] > 0) & (store_perf["sales_gap"] >= 50),
+        store_perf["sales_gap"] * store_perf["opportunity_confidence"],
+        0
+    )
+
+    store_perf["opportunity_priority"] = np.select(
+        [
+            store_perf["revenue_opportunity_score"] >= 500,
+            (store_perf["revenue_opportunity_score"] >= 200) & (store_perf["revenue_opportunity_score"] < 500),
+            (store_perf["revenue_opportunity_score"] > 0) & (store_perf["revenue_opportunity_score"] < 200)
+        ],
+        ["High", "Medium", "Low"],
+        default="None"
+    )
+
     underperforming_stores = (
         store_perf[store_perf["underperforming_flag"]]
-        .sort_values(["sales_gap", "store_performance_index"], ascending=[False, True])
+        .sort_values(["revenue_opportunity_score", "store_performance_index"], ascending=[False, True])
         .reset_index(drop=True)
     )
 
+    # Distribution Gap
     carried = (
         sales_13w
         .groupby(["brand", "category", "retailer", "store_id"], dropna=False)
@@ -409,17 +490,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     ) * 100
     brand_distribution["distribution_gap_index"] = brand_distribution["distribution_gap_index"].fillna(0)
 
-    store_opportunity = store_perf[[
-        "store_id", "retailer", "region", "state", "format",
-        "actual_sales", "expected_sales", "sales_gap", "store_performance_index"
-    ]].copy()
-
-    store_opportunity["revenue_opportunity_score"] = np.where(
-        store_opportunity["sales_gap"] > 0,
-        store_opportunity["sales_gap"],
-        0
-    )
-
+    # Recent SKU declines
     sku_declines = (
         sales_enriched
         .groupby(["sku_id", "brand", "category", "week_end_date"], dropna=False)
@@ -441,6 +512,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
         .reset_index(drop=True)
     )
 
+    # Shelf Productivity
     if len(shelf) > 0 and {"store_id", "sku_id"}.issubset(shelf.columns):
         if "facings" not in shelf.columns:
             shelf["facings"] = np.nan
@@ -469,6 +541,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
     else:
         shelf_metrics = pd.DataFrame()
 
+    # YoY
     sales_enriched["year"] = sales_enriched["week_end_date"].dt.year
 
     yearly_sku = (
@@ -513,6 +586,7 @@ def run_analysis(products, stores, sales_history, shelf=None):
             np.nan
         )
 
+    # Momentum
     velocity_13w = (
         sales_13w
         .groupby(["sku_id"], dropna=False)
@@ -559,35 +633,44 @@ def run_analysis(products, stores, sales_history, shelf=None):
         default="Stable"
     )
 
+    # Data quality
+    quality_checks, quality_score = run_data_quality_checks(products, stores, sales_history, shelf)
+
+    # Recommendations
+    recommendations = build_recommendations(underperforming_stores, brand_distribution, yoy_growth, momentum)
+
+    # Health summary
     underperf_rate = float(store_perf["underperforming_flag"].mean()) if len(store_perf) else 0
     avg_spi = float(store_perf["store_performance_index"].fillna(100).mean()) if len(store_perf) else 100
     dist_gap_rate = float(brand_distribution["distribution_gap_index"].fillna(0).mean()) if len(brand_distribution) else 0
 
-    a = min(max(avg_spi, 0), 120) / 120 * 50
-    b = (1 - min(max(underperf_rate, 0), 1)) * 30
-    c = (1 - min(max(dist_gap_rate / 100, 0), 1)) * 20
-    retail_health_score = round(a + b + c, 1)
+    a = min(max(avg_spi, 0), 120) / 120 * 45
+    b = (1 - min(max(underperf_rate, 0), 1)) * 20
+    c = (1 - min(max(dist_gap_rate / 100, 0), 1)) * 15
+    d = (quality_score / 100) * 20
+
+    retail_health_score = round(a + b + c + d, 1)
 
     health_summary = pd.DataFrame([{
         "retail_health_score": retail_health_score,
+        "data_quality_score": quality_score,
         "store_count": int(store_perf["store_id"].nunique()),
         "sku_count": int(products["sku_id"].nunique()),
         "underperforming_store_count": int(store_perf["underperforming_flag"].sum()),
         "avg_store_performance_index": round(avg_spi, 2),
         "avg_distribution_gap_index": round(dist_gap_rate, 2),
-        "estimated_revenue_opportunity": round(float(store_opportunity["revenue_opportunity_score"].sum()), 2),
+        "estimated_revenue_opportunity": round(float(store_perf["revenue_opportunity_score"].sum()), 2),
     }])
-
-    quality_checks = run_data_quality_checks(products, stores, sales_history, shelf)
 
     return {
         "health_summary": health_summary,
         "quality_checks": quality_checks,
+        "recommendations": recommendations,
         "store_performance_index": store_perf,
         "underperforming_stores": underperforming_stores,
         "sku_velocity_score": sku_velocity,
         "distribution_gap_index": brand_distribution,
-        "revenue_opportunity_score": store_opportunity,
+        "revenue_opportunity_score": store_perf,
         "recent_sku_declines": recent_declines,
         "shelf_productivity_score": shelf_metrics,
         "yoy_growth": yoy_growth,
@@ -602,6 +685,22 @@ def to_excel_download(results_dict):
                 df.to_excel(writer, sheet_name=name[:31], index=False)
     output.seek(0)
     return output
+
+def make_bar_chart(df, x_col, y_col, title, top_n=10, ascending=False):
+    if df is None or len(df) == 0 or x_col not in df.columns or y_col not in df.columns:
+        return None
+
+    temp = df[[x_col, y_col]].dropna().copy()
+    if len(temp) == 0:
+        return None
+
+    temp = temp.sort_values(y_col, ascending=ascending).head(top_n)
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    ax.bar(temp[x_col].astype(str), temp[y_col])
+    ax.set_title(title)
+    ax.tick_params(axis="x", rotation=45)
+    plt.tight_layout()
+    return fig
 
 # =========================================================
 # APP UI
@@ -694,9 +793,11 @@ if run_clicked:
 
         health = results["health_summary"]
         quality = results["quality_checks"]
+        recommendations = results["recommendations"]
         underperf = results["underperforming_stores"]
         sku = results["sku_velocity_score"]
         dist = results["distribution_gap_index"]
+        opp = results["revenue_opportunity_score"]
         declines = results["recent_sku_declines"]
         shelf_df = results["shelf_productivity_score"]
         yoy = results["yoy_growth"]
@@ -706,11 +807,12 @@ if run_clicked:
 
         st.success("Analysis complete.")
 
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3, c4, c5 = st.columns(5)
         c1.metric("Retail Health Score", summary["retail_health_score"])
-        c2.metric("Underperforming Stores", int(summary["underperforming_store_count"]))
-        c3.metric("Average SPI", round(summary["avg_store_performance_index"], 1))
-        c4.metric("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}")
+        c2.metric("Data Quality Score", summary["data_quality_score"])
+        c3.metric("Underperforming Stores", int(summary["underperforming_store_count"]))
+        c4.metric("Average SPI", round(summary["avg_store_performance_index"], 1))
+        c5.metric("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}")
 
         st.divider()
 
@@ -720,14 +822,14 @@ if run_clicked:
         st.subheader("AI Summary")
         st.info(
             f"Retail Health Score is {summary['retail_health_score']}. "
+            f"Data Quality Score is {summary['data_quality_score']}. "
             f"There are {int(summary['underperforming_store_count'])} underperforming stores and an estimated "
             f"revenue opportunity of ${summary['estimated_revenue_opportunity']:,.0f}. "
             f"Data quality checks found {fail_count} failures and {warn_count} warnings. "
             f"Regions were auto-assigned from state values in the Stores sheet."
         )
 
-        # Executive summary prep
-        top_underperf = underperf.sort_values("sales_gap", ascending=False).head(5) if len(underperf) else pd.DataFrame()
+        top_underperf = underperf.sort_values("revenue_opportunity_score", ascending=False).head(5) if len(underperf) else pd.DataFrame()
         top_dist = dist.sort_values("distribution_gap_count", ascending=False).head(5) if len(dist) else pd.DataFrame()
         top_yoy = yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last").head(5) if len(yoy) else pd.DataFrame()
         bottom_yoy = yoy.sort_values("yoy_sales_growth_pct", ascending=True, na_position="last").head(5) if len(yoy) else pd.DataFrame()
@@ -743,21 +845,95 @@ if run_clicked:
             "Recent SKU Declines",
             "Shelf Productivity",
             "YoY Growth",
-            "Momentum"
+            "Momentum",
+            "Recommendations"
         ])
 
         with tabs[0]:
             st.subheader("Executive Summary")
 
-            e1, e2, e3, e4 = st.columns(4)
+            e1, e2, e3, e4, e5 = st.columns(5)
             e1.metric("Retail Health Score", summary["retail_health_score"])
-            e2.metric("Underperforming Stores", int(summary["underperforming_store_count"]))
-            e3.metric("Avg SPI", round(summary["avg_store_performance_index"], 1))
-            e4.metric("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}")
+            e2.metric("Data Quality Score", summary["data_quality_score"])
+            e3.metric("Underperforming Stores", int(summary["underperforming_store_count"]))
+            e4.metric("Avg SPI", round(summary["avg_store_performance_index"], 1))
+            e5.metric("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}")
+
+            st.markdown("### Key Charts")
+
+            chart_col1, chart_col2 = st.columns(2)
+
+            with chart_col1:
+                fig = make_bar_chart(
+                    underperf.assign(store_label=underperf["store_id"].astype(str)) if len(underperf) else underperf,
+                    "store_label",
+                    "revenue_opportunity_score",
+                    "Top Store Revenue Opportunities",
+                    top_n=10,
+                    ascending=False
+                )
+                if fig:
+                    st.pyplot(fig)
+                else:
+                    st.info("No store opportunity chart available.")
+
+            with chart_col2:
+                fig = make_bar_chart(
+                    dist.assign(gap_label=dist["brand"].astype(str) + " | " + dist["retailer"].astype(str)) if len(dist) else dist,
+                    "gap_label",
+                    "distribution_gap_count",
+                    "Top Distribution Gaps",
+                    top_n=10,
+                    ascending=False
+                )
+                if fig:
+                    st.pyplot(fig)
+                else:
+                    st.info("No distribution gap chart available.")
+
+            chart_col3, chart_col4 = st.columns(2)
+
+            with chart_col3:
+                if len(yoy):
+                    yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"]).copy()
+                    yoy_clean["sku_label"] = yoy_clean["sku_id"].astype(str)
+                    fig = make_bar_chart(
+                        yoy_clean,
+                        "sku_label",
+                        "yoy_sales_growth_pct",
+                        "Top YoY Sales Growth",
+                        top_n=10,
+                        ascending=False
+                    )
+                    if fig:
+                        st.pyplot(fig)
+                    else:
+                        st.info("No YoY chart available.")
+                else:
+                    st.info("No YoY chart available.")
+
+            with chart_col4:
+                if len(momentum):
+                    temp = momentum.copy()
+                    temp["sku_label"] = temp["sku_id"].astype(str)
+                    fig = make_bar_chart(
+                        temp,
+                        "sku_label",
+                        "momentum_ratio",
+                        "Top Momentum Ratios",
+                        top_n=10,
+                        ascending=False
+                    )
+                    if fig:
+                        st.pyplot(fig)
+                    else:
+                        st.info("No momentum chart available.")
+                else:
+                    st.info("No momentum chart available.")
 
             st.markdown("### Top Underperforming Stores")
             if len(top_underperf):
-                cols = [c for c in ["store_id", "retailer", "region", "actual_sales", "expected_sales", "sales_gap"] if c in top_underperf.columns]
+                cols = [c for c in ["store_id", "retailer", "region", "actual_sales", "expected_sales", "sales_gap", "revenue_opportunity_score", "opportunity_priority"] if c in top_underperf.columns]
                 st.dataframe(top_underperf[cols], use_container_width=True)
             else:
                 st.info("No underperforming stores found.")
@@ -769,20 +945,20 @@ if run_clicked:
             else:
                 st.info("No distribution gaps found.")
 
-            c_left, c_right = st.columns(2)
+            left, right = st.columns(2)
 
-            with c_left:
+            with left:
                 st.markdown("### Top YoY Winners")
                 if len(top_yoy):
-                    cols = [c for c in top_yoy.columns if c in ["sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct"]]
+                    cols = [c for c in ["sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct"] if c in top_yoy.columns]
                     st.dataframe(top_yoy[cols], use_container_width=True)
                 else:
                     st.info("Not enough history for YoY analysis.")
 
-            with c_right:
+            with right:
                 st.markdown("### Top YoY Decliners")
                 if len(bottom_yoy):
-                    cols = [c for c in bottom_yoy.columns if c in ["sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct"]]
+                    cols = [c for c in ["sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct"] if c in bottom_yoy.columns]
                     st.dataframe(bottom_yoy[cols], use_container_width=True)
                 else:
                     st.info("Not enough history for YoY analysis.")
@@ -796,18 +972,19 @@ if run_clicked:
 
             st.markdown("### Highest Priority Data Quality Issues")
             if len(quality_issues):
-                st.dataframe(quality_issues, use_container_width=True)
+                st.dataframe(quality_issues[["check", "status", "count"]], use_container_width=True)
             else:
                 st.success("No data quality failures or warnings found.")
 
         with tabs[1]:
             st.subheader("Automatic Data Quality Check")
-            st.dataframe(quality, use_container_width=True)
+            st.dataframe(quality[["check", "status", "count"]], use_container_width=True)
 
         with tabs[2]:
             cols = [c for c in [
                 "store_id", "retailer", "region", "actual_sales",
-                "expected_sales", "store_performance_index", "sales_gap"
+                "expected_sales", "store_performance_index", "sales_gap",
+                "revenue_opportunity_score", "opportunity_priority"
             ] if c in underperf.columns]
             st.dataframe(underperf[cols].head(100), use_container_width=True)
 
@@ -875,6 +1052,13 @@ if run_clicked:
                     momentum.sort_values("momentum_ratio", ascending=False, na_position="last")[cols].head(100),
                     use_container_width=True
                 )
+
+        with tabs[9]:
+            st.subheader("Recommended Actions")
+            if len(recommendations):
+                st.dataframe(recommendations, use_container_width=True)
+            else:
+                st.info("No recommendations available.")
 
         st.divider()
 
