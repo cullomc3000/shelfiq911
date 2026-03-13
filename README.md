@@ -1,20 +1,17 @@
-ShelfIQ 911 - McKinsey Dashboard Bundle
+ShelfIQ 911 Streamlit App
 
-Included:
+Files:
 - streamlit_app.py
 - requirements.txt
 
-Use:
-1. Upload both files to your GitHub repo.
-2. Make sure the repo uses requirements.txt exactly.
-3. Deploy streamlit_app.py in Streamlit Cloud.
+Steps to run:
 
-This version includes:
-- McKinsey / PowerBI-style executive dashboard
-- Sidebar navigation
-- KPI cards
-- Executive narrative
-- Strategic Action Center
-- Demo data and client upload mode
+1. Upload project to GitHub
+2. Deploy using Streamlit Cloud
+3. Upload client Excel file with sheets:
+   - Sales_History
+   - Products
+   - Stores
+   - Shelf_Snapshot (optional)
 
 
