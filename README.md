@@ -13,5 +13,3 @@ Steps to run:
    - Products
    - Stores
    - Shelf_Snapshot (optional)
-
-
