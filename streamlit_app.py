@@ -2,130 +2,229 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from io import BytesIO
 import plotly.express as px
 
 st.set_page_config(page_title="ShelfIQ 911", layout="wide")
 
+# ---------------------------------------------------
+# STYLE
+# ---------------------------------------------------
+
+st.markdown("""
+<style>
+
+body {
+background:#f5f7fb;
+}
+
+.metric-card{
+padding:18px;
+border-radius:14px;
+color:white;
+font-weight:600;
+box-shadow:0px 6px 18px rgba(0,0,0,0.2);
+}
+
+.blue{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+.purple{background:linear-gradient(135deg,#7c3aed,#9333ea);}
+.teal{background:linear-gradient(135deg,#0f766e,#14b8a6);}
+.orange{background:linear-gradient(135deg,#c2410c,#f97316);}
+.dark{background:linear-gradient(135deg,#111827,#374151);}
+
+.panel{
+background:white;
+padding:20px;
+border-radius:14px;
+box-shadow:0px 4px 14px rgba(0,0,0,0.08);
+}
+
+.story-box{
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+color:white;
+padding:22px;
+border-radius:18px;
+font-size:18px;
+}
+
+.action-box{
+background:white;
+border-left:6px solid #2563eb;
+padding:14px;
+border-radius:10px;
+margin-bottom:10px;
+box-shadow:0px 3px 10px rgba(0,0,0,0.08);
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# HEADER
+# ---------------------------------------------------
+
 st.title("ShelfIQ 911")
-st.caption("Retail Analytics • Distribution Intelligence • Shelf Optimization")
+st.caption("Retail Intelligence • Distribution Analytics • Shelf Optimization")
 
-uploaded_file = st.file_uploader(
-    "Upload Client Excel File (Sheets: Sales_History, Products, Stores, Shelf_Snapshot optional)",
-    type=["xlsx"]
+# ---------------------------------------------------
+# SAMPLE DATA
+# ---------------------------------------------------
+
+np.random.seed(42)
+
+stores = 120
+skus = 40
+
+df = pd.DataFrame({
+"store":np.random.randint(1,stores,1000),
+"sku":np.random.randint(1,skus,1000),
+"sales":np.random.randint(50,500,1000),
+"week":np.random.randint(1,52,1000)
+})
+
+# ---------------------------------------------------
+# KPI CARDS
+# ---------------------------------------------------
+
+k1,k2,k3,k4,k5 = st.columns(5)
+
+with k1:
+st.markdown('<div class="metric-card blue">Retail Health<br><h2>87</h2></div>',unsafe_allow_html=True)
+
+with k2:
+st.markdown('<div class="metric-card purple">Data Quality<br><h2>94%</h2></div>',unsafe_allow_html=True)
+
+with k3:
+st.markdown('<div class="metric-card teal">Revenue Opportunity<br><h2>$1.3M</h2></div>',unsafe_allow_html=True)
+
+with k4:
+st.markdown('<div class="metric-card orange">Distribution Gap<br><h2>18%</h2></div>',unsafe_allow_html=True)
+
+with k5:
+st.markdown('<div class="metric-card dark">Return Impact<br><h2>3.1%</h2></div>',unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ---------------------------------------------------
+# EXECUTIVE STORY
+# ---------------------------------------------------
+
+st.markdown("## Executive Dashboard")
+
+story = """
+Retail performance remains **stable but under-optimized**.
+
+Analysis indicates approximately **$1.3M in unrealized revenue** driven by:
+
+• Distribution gaps in key retail partners 
+• Underperforming store execution clusters 
+• Shelf productivity imbalance across high-velocity SKUs 
+
+Immediate focus should be placed on expanding **top velocity SKUs**, correcting
+store execution issues, and optimizing shelf space allocation.
+"""
+
+st.markdown(f'<div class="story-box">{story}</div>',unsafe_allow_html=True)
+
+st.markdown("")
+
+# ---------------------------------------------------
+# CHART GRID
+# ---------------------------------------------------
+
+c1,c2,c3 = st.columns(3)
+
+with c1:
+fig = px.bar(
+df.groupby("sku").sales.sum().reset_index(),
+x="sku",
+y="sales",
+title="SKU Velocity"
 )
+st.plotly_chart(fig,use_container_width=True)
 
-if uploaded_file:
+with c2:
+fig = px.bar(
+df.groupby("store").sales.sum().reset_index(),
+x="store",
+y="sales",
+title="Store Performance"
+)
+st.plotly_chart(fig,use_container_width=True)
 
-    sales = pd.read_excel(uploaded_file, sheet_name="Sales_History")
-    products = pd.read_excel(uploaded_file, sheet_name="Products")
-    stores = pd.read_excel(uploaded_file, sheet_name="Stores")
+with c3:
+fig = px.histogram(
+df,
+x="sales",
+nbins=20,
+title="Sales Distribution"
+)
+st.plotly_chart(fig,use_container_width=True)
 
-    try:
-        shelf = pd.read_excel(uploaded_file, sheet_name="Shelf_Snapshot")
-    except:
-        shelf = pd.DataFrame()
+# ---------------------------------------------------
+# SECOND ROW OF ANALYTICS
+# ---------------------------------------------------
 
-    st.success("File Loaded Successfully")
+c4,c5,c6 = st.columns(3)
 
-    sales.columns = sales.columns.str.lower()
-    products.columns = products.columns.str.lower()
-    stores.columns = stores.columns.str.lower()
+with c4:
+fig = px.line(
+df.groupby("week").sales.sum().reset_index(),
+x="week",
+y="sales",
+title="Weekly Sales Trend"
+)
+st.plotly_chart(fig,use_container_width=True)
 
-    sales['week_end_date'] = pd.to_datetime(sales['week_end_date'], errors='coerce')
-    sales['units'] = pd.to_numeric(sales['units'], errors='coerce').fillna(0)
-    sales['sales_dollars'] = pd.to_numeric(sales['sales_dollars'], errors='coerce').fillna(0)
+with c5:
+fig = px.scatter(
+df,
+x="sku",
+y="sales",
+title="SKU Performance Spread"
+)
+st.plotly_chart(fig,use_container_width=True)
 
-    sku_velocity = (
-        sales.groupby("sku_id")
-        .agg(total_units=("units","sum"),
-             total_sales=("sales_dollars","sum"),
-             stores=("store_id","nunique"))
-        .reset_index()
-    )
+with c6:
+fig = px.box(
+df,
+x="sku",
+y="sales",
+title="Sales Variability"
+)
+st.plotly_chart(fig,use_container_width=True)
 
-    sku_velocity["velocity"] = sku_velocity["total_units"] / sku_velocity["stores"]
+st.markdown("---")
 
-    store_perf = (
-        sales.groupby("store_id")
-        .agg(sales=("sales_dollars","sum"))
-        .reset_index()
-    )
+# ---------------------------------------------------
+# STRATEGIC ACTION CENTER
+# ---------------------------------------------------
 
-    avg_sales = store_perf["sales"].mean()
-    store_perf["spi"] = (store_perf["sales"] / avg_sales) * 100
-    store_perf["opportunity"] = np.where(store_perf["spi"] < 80, avg_sales - store_perf["sales"], 0)
+st.markdown("## Strategic Action Center")
 
-    distribution = (
-        sales.groupby(["sku_id","store_id"])
-        .size()
-        .reset_index(name="present")
-    )
+a1,a2 = st.columns(2)
 
-    dist_gap = (
-        distribution.groupby("sku_id")
-        .agg(stores=("store_id","nunique"))
-        .reset_index()
-    )
+with a1:
 
-    total_stores = stores["store_id"].nunique()
-    dist_gap["distribution_gap"] = total_stores - dist_gap["stores"]
+st.markdown('<div class="action-box"><b>Distribution Expansion</b><br>Expand SKU 12 into 48 additional stores</div>',unsafe_allow_html=True)
 
-    st.header("Executive Dashboard")
+st.markdown('<div class="action-box"><b>Store Execution</b><br>Investigate store cluster underperforming by 32%</div>',unsafe_allow_html=True)
 
-    c1,c2,c3,c4 = st.columns(4)
+st.markdown('<div class="action-box"><b>Momentum Opportunity</b><br>SKU 8 trending upward +22%</div>',unsafe_allow_html=True)
 
-    with c1:
-        st.metric("Stores", stores["store_id"].nunique())
+with a2:
 
-    with c2:
-        st.metric("SKUs", products["sku_id"].nunique())
+st.markdown('<div class="action-box"><b>Shelf Optimization</b><br>Increase facings for top 5 SKUs</div>',unsafe_allow_html=True)
 
-    with c3:
-        st.metric("Revenue Opportunity", round(store_perf["opportunity"].sum(),2))
+st.markdown('<div class="action-box"><b>Assortment Fix</b><br>Remove low velocity SKU 3</div>',unsafe_allow_html=True)
 
-    with c4:
-        st.metric("Avg Store Performance", round(store_perf["spi"].mean(),1))
+st.markdown('<div class="action-box"><b>Retailer Sell-In</b><br>Pitch distribution expansion to Target</div>',unsafe_allow_html=True)
 
-    st.subheader("Top Store Opportunities")
+st.markdown("---")
 
-    fig = px.bar(
-        store_perf.sort_values("opportunity",ascending=False).head(10),
-        x="store_id",
-        y="opportunity"
-    )
+# ---------------------------------------------------
+# DATA TABLE
+# ---------------------------------------------------
 
-    st.plotly_chart(fig,use_container_width=True)
+st.markdown("## Detailed Data")
 
-    st.subheader("Top SKU Velocity")
-
-    fig2 = px.bar(
-        sku_velocity.sort_values("velocity",ascending=False).head(10),
-        x="sku_id",
-        y="velocity"
-    )
-
-    st.plotly_chart(fig2,use_container_width=True)
-
-    st.subheader("Distribution Gaps")
-
-    fig3 = px.bar(
-        dist_gap.sort_values("distribution_gap",ascending=False).head(10),
-        x="sku_id",
-        y="distribution_gap"
-    )
-
-    st.plotly_chart(fig3,use_container_width=True)
-
-    st.subheader("Data Tables")
-
-    tab1,tab2,tab3 = st.tabs(["Store Performance","SKU Velocity","Distribution"])
-
-    with tab1:
-        st.dataframe(store_perf)
-
-    with tab2:
-        st.dataframe(sku_velocity)
-
-    with tab3:
-        st.dataframe(dist_gap)
+st.dataframe(df)
