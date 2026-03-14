@@ -36,47 +36,38 @@ st.markdown("""
 :root {
     --bg-top:#08111d;
     --bg-mid:#0c1828;
-    --bg-bottom:#121f31;
-    --panel:#111b2b;
-    --panel-2:#162235;
-    --panel-3:#1a2940;
-    --line:#26364f;
-    --line-2:#304562;
-    --text:#eef4fb;
-    --text-2:#c6d3e3;
-    --text-3:#90a4bc;
-    --accent:#78a9ff;
-    --accent-2:#9fc0ff;
+    --bg-bottom:#14253d;
+    --panel:#0f1c2d;
+    --panel-2:#13243a;
+    --panel-3:#17304b;
+    --line:#28405e;
+    --line-2:#36567e;
+    --text:#edf5ff;
+    --text-2:#c0d2e8;
+    --text-3:#87a2c3;
+    --accent:#8db8ff;
     --shadow:0 14px 34px rgba(0,0,0,0.34);
 }
-html, body, [class*="css"] {
-    color: var(--text);
-}
-.stApp,
-[data-testid="stAppViewContainer"] {
+html, body, [class*="css"] { color: var(--text); }
+.stApp, [data-testid="stAppViewContainer"] {
     background:
-        radial-gradient(circle at top right, rgba(120,169,255,0.08), transparent 16%),
-        radial-gradient(circle at top left, rgba(89,148,255,0.06), transparent 14%),
-        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 42%, var(--bg-bottom) 100%);
+        radial-gradient(circle at top right, rgba(120,169,255,0.10), transparent 18%),
+        radial-gradient(circle at top left, rgba(89,148,255,0.07), transparent 15%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
 }
 .block-container {
     max-width: 1540px;
-    padding-top: 0.65rem;
-    padding-bottom: 1.6rem;
+    padding-top: 0.55rem;
+    padding-bottom: 1.35rem;
 }
-h1, h2, h3, h4, h5, h6, p, span, label, div {
-    color: var(--text);
-}
-small, .small-note, .stCaption, .stMarkdown small {
-    color: var(--text-3) !important;
-}
+h1, h2, h3, h4, h5, h6, p, span, label, div { color: var(--text); }
+small, .small-note, .stCaption, .stMarkdown small { color: var(--text-3) !important; }
+
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #07101b 0%, #0b1624 100%);
+    background: linear-gradient(180deg, #09111c 0%, #0d1929 100%);
     border-right: 1px solid rgba(255,255,255,0.06);
 }
-section[data-testid="stSidebar"] * {
-    color: var(--text) !important;
-}
+section[data-testid="stSidebar"] * { color: var(--text) !important; }
 section[data-testid="stSidebar"] .stFileUploader,
 section[data-testid="stSidebar"] [data-baseweb="select"],
 section[data-testid="stSidebar"] .stTextInput > div > div,
@@ -87,158 +78,176 @@ section[data-testid="stSidebar"] .stMultiSelect {
     border-radius: 16px !important;
 }
 section[data-testid="stSidebar"] .stButton > button,
-section[data-testid="stSidebar"] .stDownloadButton > button {
-    background: linear-gradient(180deg, #21406a 0%, #172a46 100%) !important;
-    border: 1px solid #35507a !important;
-    color: #eef4fb !important;
+section[data-testid="stSidebar"] .stDownloadButton > button,
+.stButton > button, .stDownloadButton > button {
+    background: linear-gradient(180deg, #2b5f9d 0%, #21406a 100%) !important;
+    border: 1px solid #4d72a6 !important;
+    color: #f5fbff !important;
+    border-radius: 16px !important;
+    font-weight: 700 !important;
 }
-div[data-testid="stTabs"] {
-    margin-top: 0.35rem;
-}
+
+div[data-testid="stTabs"] { margin-top: 0.25rem; }
 div[data-testid="stTabs"] button {
     border-radius: 999px;
-    padding: 0.62rem 1rem;
-    border: 1px solid #2a3b55;
-    background: linear-gradient(180deg, #121d2d 0%, #0f1827 100%);
+    padding: 0.56rem 0.9rem;
+    border: 1px solid #355074;
+    background: linear-gradient(180deg, #152538 0%, #112031 100%);
     color: #d7e4f4;
     font-weight: 700;
-    box-shadow: none;
-}
-div[data-testid="stTabs"] button:hover {
-    background: linear-gradient(180deg, #182538 0%, #142133 100%);
-    color: #ffffff;
-    border-color: #3a5275;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    background: linear-gradient(180deg, #263b59 0%, #1a2b45 100%);
+    background: linear-gradient(180deg, #2e5894 0%, #23406a 100%);
     color: #ffffff;
-    border-color: #5f84bd;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 22px rgba(0,0,0,0.22);
+    border-color: #86aef0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
 }
+
 .hero-shell, .executive-band, .panel, .download-panel, .insight-card, .action-card, .metric-card {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%) !important;
-    border: 1px solid var(--line) !important;
+    background: linear-gradient(180deg, #102033 0%, #15304a 100%) !important;
+    border: 1px solid #2a4666 !important;
     box-shadow: var(--shadow) !important;
+    overflow: hidden !important;
 }
 .hero-shell {
     border-radius: 28px;
-    padding: 22px 24px;
-    margin-bottom: 0.7rem;
+    padding: 18px 22px;
+    margin-bottom: 0.55rem;
 }
-.hero-kicker, .executive-kicker, .insight-kicker {
-    color: var(--accent-2) !important;
+.hero-grid { display:grid; grid-template-columns: 78px 1.5fr 1fr; gap:18px; align-items:start; }
+.hero-logo-wrap {
+    width:72px; height:72px; border-radius:18px;
+    background: linear-gradient(180deg, #1a2e46 0%, #142437 100%);
+    border:1px solid #2f4a69; display:flex; align-items:center; justify-content:center;
 }
-.hero-title, .executive-title, .section-title, .insight-headline, .action-title {
-    color: #f7fbff !important;
-}
-.hero-copy, .executive-copy, .action-copy, .insight-sub, .metric-sub, .signal-label {
-    color: var(--text-2) !important;
-}
+.hero-kicker, .executive-kicker, .insight-kicker { color: #a9c8ff !important; }
+.hero-title, .executive-title, .section-title, .insight-headline, .action-title { color: #f8fbff !important; }
+.hero-title { font-size: 1.75rem !important; margin-bottom: 0.35rem !important; }
+.hero-copy, .executive-copy, .action-copy, .insight-sub, .metric-sub, .signal-label { color: var(--text-2) !important; }
+.hero-chip-row { display:flex; flex-wrap:wrap; gap:8px; margin-top: 10px; }
 .hero-chip, .signal-card, .insight-pill {
-    background: linear-gradient(180deg, #18263a 0%, #142133 100%) !important;
-    border: 1px solid var(--line) !important;
+    background: linear-gradient(180deg, #182b42 0%, #15263a 100%) !important;
+    border: 1px solid #335375 !important;
     color: var(--text) !important;
 }
+.hero-chip { padding: 8px 12px; border-radius:999px; font-size:0.78rem; }
+.hero-panel { background: linear-gradient(180deg, #182b42 0%, #15263a 100%); border:1px solid #335375; border-radius:22px; padding:14px; }
+.hero-panel-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.hero-stat { background: rgba(255,255,255,0.02); border:1px solid #28405e; border-radius:16px; padding:10px 11px; }
+.hero-stat-label { color:#9db7d5; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; }
+.hero-stat-value { color:#f5fbff; font-weight:700; font-size:0.92rem; }
+
+.executive-band { border-radius: 24px; padding: 16px 18px; margin-bottom: 0.6rem; }
+.signal-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:10px; }
+.signal-card { border-radius:18px; padding:10px 12px; }
+.signal-value { color:#fff !important; font-size:1.05rem; font-weight:780; }
+
 .metric-card {
-    min-height: 122px;
+    min-height: 138px;
     border-radius: 22px;
     position: relative;
-    overflow: hidden;
+    padding: 14px 14px 12px 16px !important;
 }
 .metric-card:before {
     content:"";
-    position:absolute;
-    left:0; top:0; bottom:0;
-    width:4px;
-    background: linear-gradient(180deg, #8eb5ff 0%, #597dba 100%);
+    position:absolute; left:0; top:0; bottom:0; width:4px;
+    background: linear-gradient(180deg, #9ac0ff 0%, #5f83bd 100%);
 }
-.metric-label { color: var(--text-3) !important; }
-.metric-value { color: #ffffff !important; }
+.metric-label {
+    color: var(--text-3) !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase;
+    margin-bottom: 8px !important;
+}
+.metric-value {
+    color: #ffffff !important;
+    font-size: 1.7rem !important;
+    line-height: 1.08 !important;
+    font-weight: 800 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+.metric-sub {
+    color: #d8e6f6 !important;
+    font-size: 0.88rem !important;
+    line-height: 1.35 !important;
+    margin-top: 8px !important;
+}
+
 .ai-box {
-    background: linear-gradient(180deg, #101a29 0%, #142337 100%) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 24px;
-    padding: 20px;
+    background: linear-gradient(180deg, #13243a 0%, #17304b 100%) !important;
+    border: 1px solid #2f4a69 !important;
+    border-radius: 22px;
+    padding: 16px;
 }
-.ai-box *, .panel *, .executive-band *, .hero-shell *, .insight-card *, .action-card * {
-    color: inherit;
-}
-.ai-box ul {
-    margin: 0.75rem 0 0 1rem !important;
-    padding-left: 1rem !important;
-}
-.ai-box li {
-    color: #edf4fb !important;
-    font-size: 0.96rem !important;
-    line-height: 1.7 !important;
-    margin-bottom: 0.62rem !important;
-}
-.badge-good { background: #163024; color: #bcead1; }
-.badge-warn { background: #352917; color: #f4d9a6; }
-.badge-risk { background: #381c21; color: #ffbcc4; }
-.js-plotly-plot, .plotly, .plot-container, [data-testid="stPlotlyChart"] {
+.ai-box ul { margin: 0.4rem 0 0 1rem !important; padding-left: 0.8rem !important; }
+.ai-box li { color: #edf4fb !important; font-size: 0.95rem !important; line-height: 1.55 !important; margin-bottom: 0.42rem !important; }
+
+.badge-good { background: #183829; color: #b8e7cf; }
+.badge-warn { background: #3b2e1a; color: #f3d4a4; }
+.badge-risk { background: #432028; color: #ffc0c8; }
+
+[data-testid="stPlotlyChart"] {
+    background: linear-gradient(180deg, #13243a 0%, #102033 100%);
+    border: 1px solid #294564;
+    border-radius: 22px;
+    padding: 8px 8px 2px 8px;
+    box-shadow: var(--shadow);
     overflow: hidden !important;
 }
-[data-testid="stPlotlyChart"] {
-    background: linear-gradient(180deg, #121d2c 0%, #101826 100%);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    padding: 10px 10px 2px 10px;
-    box-shadow: var(--shadow);
-}
 [data-testid="stPlotlyChart"] .modebar { display: none !important; }
+
 div[data-testid="stDataFrame"] {
-    background: linear-gradient(180deg, #121d2c 0%, #101826 100%) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 18px !important;
+    background: linear-gradient(180deg, #13243a 0%, #102033 100%) !important;
+    border: 1px solid #294564 !important;
+    border-radius: 16px !important;
     overflow: hidden !important;
     box-shadow: var(--shadow) !important;
 }
-div[data-testid="stDataFrame"] * {
-    color: #edf4fb !important;
-}
+div[data-testid="stDataFrame"] * { color: #edf4fb !important; }
 div[data-testid="stDataFrame"] [role="columnheader"] {
     position: static !important;
-    background: #172437 !important;
+    background: #1a2f48 !important;
     text-transform: capitalize;
 }
-div[data-testid="stDataFrame"] [role="gridcell"] {
-    background: #101826 !important;
-}
-.html-table-wrap {
-    background: #101826;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    overflow: hidden;
-}
-.html-table-wrap table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
+div[data-testid="stDataFrame"] [role="gridcell"] { background: #102033 !important; }
+
+.html-table-wrap { background: #102033; border: 1px solid #294564; border-radius: 16px; overflow: hidden; }
+.html-table-wrap table { width:100%; border-collapse:collapse; font-size:0.92rem; }
 .html-table-wrap thead th {
-    background: #172437;
-    color: #f5f9ff;
-    text-align: left;
-    padding: 11px 12px;
-    font-size: 0.78rem;
-    text-transform: capitalize;
-    letter-spacing: 0.02em;
+    background:#1a2f48; color:#f5f9ff; text-align:left; padding:10px 12px;
+    font-size:0.8rem; text-transform:capitalize; letter-spacing:0.02em;
 }
 .html-table-wrap tbody td {
-    padding: 10px 12px;
-    border-top: 1px solid #22324a;
-    color: #dfe9f6;
-    vertical-align: top;
+    padding:10px 12px; border-top:1px solid #223853; color:#dfe9f6; vertical-align:top;
+    line-height:1.3;
 }
-.html-table-wrap tbody tr:nth-child(even) { background: #132031; }
+.html-table-wrap tbody tr:nth-child(even) { background:#13273e; }
+
+.insight-card { padding: 15px 16px; border-radius:22px; }
+.insight-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.insight-pill { padding:12px 13px; border-radius:16px; min-height:118px; }
+.insight-pill-label { color:#9db7d5 !important; font-size:0.7rem !important; letter-spacing:0.05em !important; text-transform:uppercase; }
+.insight-pill-value { color:#eef5ff !important; font-size:0.94rem !important; line-height:1.45 !important; }
+
+.action-card { padding:14px; border-radius:22px; min-height: 340px; }
+.action-title { font-size: 1rem; font-weight: 760; margin-bottom: 0.25rem; }
+.action-copy { font-size: 0.86rem; margin-bottom: 0.7rem; }
+
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: #0d1725; }
-::-webkit-scrollbar-thumb { background: #344964; border-radius: 999px; border: 2px solid #0d1725; }
-::-webkit-scrollbar-thumb:hover { background: #4b678d; }
-[data-testid="stVerticalBlock"] { gap: 0.65rem; }
-[data-testid="stHorizontalBlock"] { gap: 0.85rem; }
-.stMarkdown { margin-bottom: 0.15rem !important; }
+::-webkit-scrollbar-thumb { background: #4d72a6; border-radius: 999px; border: 2px solid #0d1725; }
+::-webkit-scrollbar-thumb:hover { background: #6c90c5; }
+
+[data-testid="stVerticalBlock"] { gap: 0.55rem; }
+[data-testid="stHorizontalBlock"] { gap: 0.75rem; }
+.stMarkdown { margin-bottom: 0.1rem !important; }
+
+@media (max-width: 980px) {
+    .hero-grid, .signal-strip, .insight-grid, .hero-panel-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -306,21 +315,22 @@ def add_logo_to_sheet(ws, logo_bytes=None, cell="A1", width=135):
 # UI HELPERS
 # =========================================================
 
+
 def render_header(logo_bytes=None):
     logo_html = ""
     if logo_bytes:
         import base64
         encoded = base64.b64encode(logo_bytes).decode("utf-8")
-        logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:68px; max-height:68px; border-radius:14px;" />'
+        logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:60px; max-height:60px; border-radius:12px;" />'
     elif Path(LOGO_PATH).exists():
         try:
             import base64
             encoded = base64.b64encode(Path(LOGO_PATH).read_bytes()).decode("utf-8")
-            logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:68px; max-height:68px; border-radius:14px;" />'
+            logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:60px; max-height:60px; border-radius:12px;" />'
         except Exception:
-            logo_html = '<div style="color:white;font-size:1.6rem;font-weight:800;">SI</div>'
+            logo_html = '<div style="color:white;font-size:1.45rem;font-weight:800;">SI</div>'
     else:
-        logo_html = '<div style="color:white;font-size:1.6rem;font-weight:800;">SI</div>'
+        logo_html = '<div style="color:white;font-size:1.45rem;font-weight:800;">SI</div>'
 
     st.markdown(
         f"""
@@ -328,30 +338,30 @@ def render_header(logo_bytes=None):
             <div class="hero-grid">
                 <div class="hero-logo-wrap">{logo_html}</div>
                 <div>
-                    <div class="hero-kicker">Circana-style retail intelligence</div>
+                    <div class="hero-kicker">ShelfIQ 911 Retail Intelligence</div>
                     <div class="hero-title">{APP_TITLE}</div>
                     <div class="hero-copy">
-                        Professional retail analytics with cleaner storytelling across distribution, velocity,
-                        store productivity, quality risk, and growth signals. Built to feel like a modern
-                        insights workspace instead of a basic demo dashboard.
+                        Retail signal tracking for distribution, velocity, productivity, whitespace, and risk —
+                        designed to help teams spot where performance is strongest, where issues are emerging,
+                        and where commercial action should move first.
                     </div>
                     <div class="hero-chip-row">
-                        <div class="hero-chip">Executive KPI hierarchy</div>
-                        <div class="hero-chip">Sharper trend visuals</div>
-                        <div class="hero-chip">Cleaner risk indicators</div>
-                        <div class="hero-chip">Action-based readouts</div>
+                        <div class="hero-chip">Retail Health</div>
+                        <div class="hero-chip">Revenue Opportunity</div>
+                        <div class="hero-chip">Trend Signals</div>
+                        <div class="hero-chip">Commercial Actions</div>
                     </div>
                 </div>
                 <div class="hero-panel">
-                    <div class="hero-panel-title">What this workspace delivers</div>
+                    <div class="hero-panel-title">Workspace Focus</div>
                     <div class="hero-panel-grid">
                         <div class="hero-stat">
                             <div class="hero-stat-label">Health</div>
-                            <div class="hero-stat-value">Data + retail quality</div>
+                            <div class="hero-stat-value">Data and retail quality</div>
                         </div>
                         <div class="hero-stat">
                             <div class="hero-stat-label">Signals</div>
-                            <div class="hero-stat-value">Trend + momentum views</div>
+                            <div class="hero-stat-value">Velocity and momentum</div>
                         </div>
                         <div class="hero-stat">
                             <div class="hero-stat-label">Gaps</div>
@@ -359,17 +369,13 @@ def render_header(logo_bytes=None):
                         </div>
                         <div class="hero-stat">
                             <div class="hero-stat-label">Action</div>
-                            <div class="hero-stat-value">Workbook + PDF export</div>
+                            <div class="hero-stat-value">Workbook and PDF export</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         """,
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<div class='small-note' style='margin:0.15rem 0 0.7rem 0;'>{APP_SUBTITLE}</div>",
         unsafe_allow_html=True
     )
 
@@ -1552,7 +1558,7 @@ def chart_panel(fig):
 
 
 
-def render_html_table_card(df, title, subtitle="", columns=None, max_rows=8):
+def render_html_table_card(df, title, subtitle="", columns=None, max_rows=6):
     st.markdown(f"<div class='action-card'><div class='action-title'>{title}</div><div class='action-copy'>{subtitle}</div>", unsafe_allow_html=True)
     if df is None or len(df) == 0:
         st.info("No records available.")
@@ -1569,6 +1575,7 @@ def render_html_table_card(df, title, subtitle="", columns=None, max_rows=8):
     st.markdown(f"<div class='html-table-wrap'>{html}</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+
 def render_insight_card(title, headline, what_happened, why_it_matters, action):
     st.markdown(
         f"""
@@ -1578,19 +1585,18 @@ def render_insight_card(title, headline, what_happened, why_it_matters, action):
                     <div class="insight-kicker">{title}</div>
                     <div class="insight-headline">{headline}</div>
                 </div>
-                <div class="insight-sub">Business interpretation</div>
             </div>
             <div class="insight-grid">
                 <div class="insight-pill">
-                    <div class="insight-pill-label">What happened</div>
+                    <div class="insight-pill-label">Signal</div>
                     <div class="insight-pill-value">{what_happened}</div>
                 </div>
                 <div class="insight-pill">
-                    <div class="insight-pill-label">Why it matters</div>
+                    <div class="insight-pill-label">Business Impact</div>
                     <div class="insight-pill-value">{why_it_matters}</div>
                 </div>
                 <div class="insight-pill">
-                    <div class="insight-pill-label">Recommended action</div>
+                    <div class="insight-pill-label">Next Move</div>
                     <div class="insight-pill-value">{action}</div>
                 </div>
             </div>
@@ -1599,8 +1605,9 @@ def render_insight_card(title, headline, what_happened, why_it_matters, action):
         unsafe_allow_html=True
     )
 
+
 def render_kpi_strip(items):
-    cols = st.columns(len(items))
+    cols = st.columns(len(items), gap="medium")
     for col, item in zip(cols, items):
         with col:
             metric_card(item.get("label","Metric"), item.get("value","-"), item.get("sub",""))
@@ -1785,7 +1792,6 @@ if "logo_bytes" not in st.session_state:
     st.session_state["logo_bytes"] = get_logo_bytes()
 
 render_header(st.session_state.get("logo_bytes"))
-st.caption("Upload your retail files, validate structure, generate executive insights, and export polished outputs.")
 
 with st.sidebar:
     uploaded_logo = st.file_uploader("Upload logo for dashboard + downloads", type=["png", "jpg", "jpeg"])
@@ -1904,27 +1910,23 @@ if run_clicked:
         st.markdown(
             f"""
             <div class="executive-band">
-                <div class="executive-kicker">Performance command center</div>
-                <div class="executive-title">Retail performance command story</div>
-                <div class="executive-copy">
-                    This version sharpens the overall experience with stronger KPI hierarchy, cleaner comparisons, easier signal reading, and more professional interpretation across data quality, store performance, whitespace, momentum, and shelf productivity.
-                </div>
+                <div class="executive-kicker">Executive Snapshot</div>
                 <div class="signal-strip">
                     <div class="signal-card">
-                        <div class="signal-label">Retail health</div>
+                        <div class="signal-label">Retail Health</div>
                         <div class="signal-value">{summary['retail_health_score']} | {summary['retail_health_label']}</div>
                     </div>
                     <div class="signal-card">
-                        <div class="signal-label">Revenue opportunity</div>
+                        <div class="signal-label">Revenue Opportunity</div>
                         <div class="signal-value">${revenue_oppty:,.0f}</div>
                     </div>
                     <div class="signal-card">
-                        <div class="signal-label">Underperforming stores</div>
+                        <div class="signal-label">Underperforming Stores</div>
                         <div class="signal-value">{int(summary['underperforming_store_count'])}</div>
                     </div>
                     <div class="signal-card">
-                        <div class="signal-label">Data quality risk</div>
-                        <div class="signal-value">{fail_count} fails | {warn_count} warnings</div>
+                        <div class="signal-label">Data Quality Risk</div>
+                        <div class="signal-value">{fail_count} Fails | {warn_count} Warnings</div>
                     </div>
                 </div>
             </div>
@@ -2045,28 +2047,27 @@ if run_clicked:
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         # ACTION PANELS
-        st.markdown("### Commercial Action Center")
+        st.markdown("### Commercial Actions")
         a1, a2 = st.columns(2)
         with a1:
             render_html_table_card(
                 recommendations,
                 "Recommendations",
-                "Cleaner commercial readout with better spacing, higher contrast, and easier prioritization.",
+                "Priority actions translated into a cleaner commercial readout.",
                 columns=["recommended_action"],
-                max_rows=8
+                max_rows=6
             )
         with a2:
             render_html_table_card(
                 sell_in,
                 "Sell-In Opportunities",
-                "Focused whitespace and sell-in actions with clearer rationale and store-level callouts when available.",
+                "Whitespace and sell-in opportunities with cleaner rationale and store-level callouts when available.",
                 columns=["priority", "retailer", "sku_or_brand", "action", "rationale"],
-                max_rows=8
+                max_rows=6
             )
 
 
         # DETAIL TABS
-        st.markdown("<div class='small-note' style='margin:0.2rem 0 0.55rem 0;'>Detailed measure tabs are below.</div>", unsafe_allow_html=True)
         tabs = st.tabs([
             "Data Quality",
             "Store Performance",
@@ -2120,11 +2121,23 @@ if run_clicked:
                 temp = underperf.copy()
                 if len(temp):
                     temp["store_label"] = temp["store_id"].astype(str)
-                    fig = scatter_chart(temp, "expected_sales", "actual_sales", "Expected vs. Actual Store Sales", color="retailer", hover_name="store_label", size="revenue_opportunity_score")
+                    comparison = temp[["store_label", "expected_sales", "actual_sales"]].copy()
+                    comp_long = comparison.melt(id_vars="store_label", value_vars=["expected_sales", "actual_sales"],
+                                                var_name="metric", value_name="sales")
+                    fig = px.bar(
+                        comp_long,
+                        x="store_label",
+                        y="sales",
+                        color="metric",
+                        barmode="group",
+                        template="plotly_dark",
+                        color_discrete_sequence=["#8db8ff", "#d4a24a"]
+                    )
+                    fig.update_layout(title=dict(text="Expected vs. Actual Store Sales", x=0, xanchor="left"))
+                    fig.update_xaxes(title_text="Store")
+                    fig.update_yaxes(title_text="Sales")
+                    fig = apply_pro_theme(fig, "Expected vs. Actual Store Sales")
                     if fig:
-                        fig.add_shape(type="line", x0=temp["expected_sales"].min(), y0=temp["expected_sales"].min(),
-                                      x1=temp["expected_sales"].max(), y1=temp["expected_sales"].max(),
-                                      line=dict(color="#94a3b8", dash="dash"))
                         chart_panel(fig)
             with c2:
                 if len(underperf):
@@ -2272,7 +2285,7 @@ if run_clicked:
                         chart_panel(fig)
                 with c2:
                     mix = momentum.groupby("momentum_flag", dropna=False).size().reset_index(name="count")
-                    fig = donut_chart(mix, "momentum_flag", "count", "Momentum Signal Mix")
+                    fig = bar_chart(mix, "momentum_flag", "count", "Momentum Signal Mix", top_n=10, horizontal=True)
                     if fig:
                         chart_panel(fig)
                 headline = "Momentum signals show where recent velocity is accelerating or cooling."
