@@ -55,9 +55,15 @@ st.markdown("""
 }
 .stApp {
     background:
-      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 22%),
-      radial-gradient(circle at top left, rgba(15,118,110,0.12), transparent 20%),
-      linear-gradient(180deg, #0a1324 0%, #101b2e 16%, #eef3f8 16%, #f5f7fb 100%);
+      radial-gradient(circle at top right, rgba(37,99,235,0.12), transparent 18%),
+      radial-gradient(circle at top left, rgba(15,118,110,0.08), transparent 16%),
+      linear-gradient(180deg, #0b1422 0%, #101b2d 14%, #edf2f7 14%, #eef3f7 100%);
+}
+[data-testid="stAppViewContainer"] {
+    background:
+      radial-gradient(circle at top right, rgba(37,99,235,0.12), transparent 18%),
+      radial-gradient(circle at top left, rgba(15,118,110,0.08), transparent 16%),
+      linear-gradient(180deg, #0b1422 0%, #101b2d 14%, #edf2f7 14%, #eef3f7 100%);
 }
 .block-container {
     padding-top: 1.1rem;
@@ -106,12 +112,12 @@ div[data-testid="stTabs"] {
 }
 div[data-testid="stTabs"] button {
     border-radius: 999px;
-    padding: 0.58rem 1rem;
-    border: 1px solid rgba(15,23,42,0.08);
-    background: rgba(255,255,255,0.78);
-    color: #344054;
-    font-weight: 650;
-    box-shadow: 0 3px 10px rgba(15,23,42,0.03);
+    padding: 0.62rem 1.05rem;
+    border: 1px solid #d9e2ec;
+    background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+    color: #334155;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(15,23,42,0.06);
 }
 div[data-testid="stTabs"] button:hover {
     border-color: #cbd8e6;
@@ -119,10 +125,10 @@ div[data-testid="stTabs"] button:hover {
     color: #0f172a;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
-    border-color: #c9daf8;
-    color: #0f172a;
-    box-shadow: 0 8px 22px rgba(37,99,235,0.10);
+    background: linear-gradient(180deg, #0f172a 0%, #1d4ed8 100%);
+    border-color: #1d4ed8;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(29,78,216,0.24);
 }
 .stButton > button, .stDownloadButton > button {
     border-radius: 15px !important;
@@ -435,6 +441,17 @@ div[data-testid="stFileUploaderDropzone"] {
     .hero-title { font-size: 1.6rem; }
     .executive-title { font-size: 1.5rem; }
 }
+
+div[data-testid="stDataFrame"] {
+    border: 1px solid #dbe5ef;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+}
+div[data-testid="stMetric"] {
+    background: transparent;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2170,11 +2187,12 @@ if run_clicked:
         ])
 
         with tabs[0]:
+            st.markdown("<div class='section-title'>Data Quality</div><div class='small-note'>Validate structural readiness and identify the highest-impact exceptions before acting on downstream measures.</div>", unsafe_allow_html=True)
             pass_checks = int((quality["status"] == "Pass").sum()) if len(quality) else 0
             warn_checks = int((quality["status"] == "Warn").sum()) if len(quality) else 0
             fail_checks = int((quality["status"] == "Fail").sum()) if len(quality) else 0
             render_kpi_strip([
-                {"label": "Quality Score", "value": format_metric_value(summary["quality_score"]), "sub": f"{summary['quality_label']} data readiness"},
+                {"label": "Quality Score", "value": format_metric_value(summary["data_quality_score"]), "sub": f"{summary['data_quality_label']} data readiness"},
                 {"label": "Failed Checks", "value": str(fail_checks), "sub": "Structural blockers to resolve"},
                 {"label": "Warnings", "value": str(warn_checks), "sub": "Items that may distort analysis"},
             ])
@@ -2198,6 +2216,7 @@ if run_clicked:
             st.dataframe(quality[["check", "status", "count"]], use_container_width=True, hide_index=True)
 
         with tabs[1]:
+            st.markdown("<div class='section-title'>Store Performance</div><div class='small-note'>Compare expected versus actual store output and prioritize where the commercial gap is greatest.</div>", unsafe_allow_html=True)
             top_store = best_row(underperf, "revenue_opportunity_score", ascending=False)
             render_kpi_strip([
                 {"label": "Largest Revenue Gap", "value": format_metric_value(top_store["revenue_opportunity_score"], "currency") if top_store is not None else "-", "sub": f"Store {top_store['store_id']}" if top_store is not None else "No store gap"},
@@ -2240,6 +2259,7 @@ if run_clicked:
             st.dataframe(underperf[cols], use_container_width=True, hide_index=True)
 
         with tabs[2]:
+            st.markdown("<div class='section-title'>SKU Velocity</div><div class='small-note'>Surface the fastest and weakest movers to guide assortment, replenishment, and space decisions.</div>", unsafe_allow_html=True)
             top_vel = best_row(sku, "velocity_units_per_store_per_week", ascending=False)
             render_kpi_strip([
                 {"label": "Top Velocity SKU", "value": format_metric_value(top_vel["velocity_units_per_store_per_week"]) if top_vel is not None else "-", "sub": f"{top_vel['brand']} | {top_vel['sku_id']}" if top_vel is not None else "No velocity leader"},
@@ -2272,6 +2292,7 @@ if run_clicked:
             st.dataframe(sku.sort_values("velocity_units_per_store_per_week", ascending=False)[cols], use_container_width=True, hide_index=True)
 
         with tabs[3]:
+            st.markdown("<div class='section-title'>Distribution Gaps</div><div class='small-note'>Pinpoint white space by brand, retailer, and category to support placement and sell-in planning.</div>", unsafe_allow_html=True)
             top_gap = best_row(dist, "distribution_gap_count", ascending=False)
             render_kpi_strip([
                 {"label": "Largest Gap", "value": format_metric_value(top_gap["distribution_gap_count"]) if top_gap is not None else "-", "sub": f"{top_gap['brand']} | {top_gap['retailer']}" if top_gap is not None else "No major gap"},
@@ -2304,6 +2325,7 @@ if run_clicked:
             st.dataframe(dist.sort_values("distribution_gap_count", ascending=False)[cols], use_container_width=True, hide_index=True)
 
         with tabs[4]:
+            st.markdown("<div class='section-title'>YoY Growth</div><div class='small-note'>Separate growth leaders from declining items and understand which categories are carrying the business.</div>", unsafe_allow_html=True)
             if len(yoy):
                 yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"]).copy()
                 top_yoy = best_row(yoy_clean, "yoy_sales_growth_pct", ascending=False)
@@ -2341,6 +2363,7 @@ if run_clicked:
                 st.info("Not enough history for YoY analysis.")
 
         with tabs[5]:
+            st.markdown("<div class='section-title'>Momentum</div><div class='small-note'>Read near-term directionality to distinguish durable acceleration from weakening trends.</div>", unsafe_allow_html=True)
             if len(momentum):
                 top_mom = best_row(momentum, "momentum_ratio", ascending=False)
                 render_kpi_strip([
@@ -2373,6 +2396,7 @@ if run_clicked:
                 st.info("Momentum could not be calculated.")
 
         with tabs[6]:
+            st.markdown("<div class='section-title'>Recent Declines</div><div class='small-note'>Highlight short-term erosion and identify which items need immediate review.</div>", unsafe_allow_html=True)
             if len(declines):
                 decline_row = best_row(declines, "wow_change_pct", ascending=True)
                 render_kpi_strip([
@@ -2411,6 +2435,7 @@ if run_clicked:
                 st.info("No recent declines detected.")
 
         with tabs[7]:
+            st.markdown("<div class='section-title'>Shelf Productivity</div><div class='small-note'>Evaluate whether facings and shelf space are translating into productive sales output.</div>", unsafe_allow_html=True)
             if len(shelf_df):
                 shelf_top = best_row(shelf_df, "space_efficiency_index", ascending=False)
                 render_kpi_strip([
