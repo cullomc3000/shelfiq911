@@ -1580,25 +1580,17 @@ def chart_panel(fig):
 
 
 def render_html_table_card(df, title, subtitle="", columns=None, max_rows=5):
-    st.markdown(f"<div class='action-card'><div class='action-title'>{title}</div><div class='action-copy'>{subtitle}</div>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div class='action-card'><div class='action-title'>{title}</div><div class='action-copy'>{subtitle}</div>",
+        unsafe_allow_html=True,
+    )
     if df is None or len(df) == 0:
         st.info("No records available.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
     view = pretty_df(df, columns=columns, max_rows=max_rows).fillna("")
     html = view.to_html(index=False, escape=False)
-    html = html.replace('border="1"', '')
-    st.markdown(f"<div class='html-table-wrap'>{html}</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-        return
-    view = df.copy().head(max_rows)
-    if columns:
-        keep = [c for c in columns if c in view.columns]
-        if keep:
-            view = view[keep]
-    view = view.fillna("")
-    html = view.to_html(index=False, escape=False, classes="html-table-wrap")
-    html = html.replace('border="1"', '')
+    html = html.replace('border="1"', "")
     st.markdown(f"<div class='html-table-wrap'>{html}</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
