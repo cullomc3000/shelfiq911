@@ -33,55 +33,242 @@ LOGO_PATH = "logo.png"
 # =========================================================
 st.markdown("""
 <style>
+:root {
+    --bg: #f3f5f9;
+    --panel: rgba(255,255,255,0.96);
+    --panel-2: #f8fafc;
+    --ink: #0f172a;
+    --muted: #667085;
+    --line: #e7ecf3;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --blue-soft: #e8f0ff;
+    --teal: #0f766e;
+    --teal-soft: #ecfeff;
+    --amber: #b45309;
+    --amber-soft: #fff7ed;
+    --rose: #b42318;
+    --rose-soft: #fff1f2;
+    --green: #166534;
+    --green-soft: #ecfdf3;
+    --shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+.stApp {
+    background:
+        radial-gradient(circle at top right, rgba(29,78,216,0.06), transparent 24%),
+        linear-gradient(180deg, #f8fafc 0%, #f3f5f9 100%);
+}
 .block-container {
-    padding-top: 1.2rem;
-    padding-bottom: 1rem;
-    max-width: 1500px;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+    max-width: 1560px;
+}
+h1, h2, h3 { letter-spacing: -0.02em; }
+div[data-testid="stTabs"] button {
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #475467;
+    font-weight: 600;
+}
+div[data-testid="stTabs"] button[aria-selected="true"] {
+    background: white;
+    border-color: #dbe5f0;
+    color: #0f172a;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+.stButton > button, .stDownloadButton > button {
+    border-radius: 14px !important;
+    min-height: 46px;
+    font-weight: 650;
+    border: 1px solid #d7e0eb !important;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.05);
 }
 .metric-card {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    border: 1px solid #334155;
-    border-radius: 18px;
-    padding: 16px 18px;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.18);
+    background: linear-gradient(180deg, #0f172a 0%, #172554 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 20px 20px 18px 20px;
+    min-height: 126px;
+    box-shadow: 0 18px 38px rgba(15,23,42,0.18);
 }
 .metric-label {
     color: #cbd5e1;
-    font-size: 0.9rem;
-    margin-bottom: 6px;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
 }
 .metric-value {
     color: white;
-    font-size: 1.9rem;
-    font-weight: 700;
-    line-height: 1.1;
+    font-size: 2rem;
+    line-height: 1.02;
+    font-weight: 760;
 }
 .metric-sub {
-    color: #94a3b8;
-    font-size: 0.85rem;
-    margin-top: 4px;
+    color: #dbe4f0;
+    font-size: 0.88rem;
+    margin-top: 10px;
 }
 .panel {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 18px;
-    padding: 14px 16px 8px 16px;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 20px 20px 16px 20px;
+    box-shadow: var(--shadow);
 }
 .section-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-}
-.ai-box {
-    background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
-    border: 1px solid #bfdbfe;
-    border-radius: 16px;
-    padding: 14px 16px;
+    font-size: 1rem;
+    font-weight: 740;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
 }
 .small-note {
-    color: #64748b;
-    font-size: 0.85rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+.executive-band {
+    background: linear-gradient(135deg, #ffffff 0%, #f7faff 55%, #eef4ff 100%);
+    border: 1px solid #dce6f5;
+    border-radius: 28px;
+    padding: 22px 24px;
+    box-shadow: 0 18px 42px rgba(29,78,216,0.06);
+    margin-bottom: 0.9rem;
+}
+.executive-kicker {
+    color: #1d4ed8;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 760;
+    margin-bottom: 8px;
+}
+.executive-title {
+    color: #0f172a;
+    font-size: 1.95rem;
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 10px;
+}
+.executive-copy {
+    color: #475467;
+    font-size: 0.98rem;
+    line-height: 1.55;
+}
+.signal-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+.signal-card {
+    background: rgba(255,255,255,0.8);
+    border: 1px solid #e5ebf3;
+    border-radius: 18px;
+    padding: 12px 14px;
+}
+.signal-label {
+    color: #667085;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+.signal-value {
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 740;
+}
+.insight-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin: 0.2rem 0 0.9rem 0;
+}
+.insight-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 12px;
+}
+.insight-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #1d4ed8;
+    font-weight: 760;
+}
+.insight-headline {
+    font-size: 1.12rem;
+    font-weight: 760;
+    color: var(--ink);
+    margin: 0;
+}
+.insight-sub {
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+.insight-grid {
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+}
+.insight-pill {
+    background: #f8fafc;
+    border: 1px solid #e7ecf3;
+    border-radius: 18px;
+    padding: 14px 14px 12px 14px;
+}
+.insight-pill-label {
+    color: #667085;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+.insight-pill-value {
+    color: #101828;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+.ai-box {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    padding: 20px;
+    box-shadow: 0 18px 38px rgba(15,23,42,0.18);
+}
+.ai-box ul, .ai-box li, .ai-box p, .ai-box strong {
+    color: #e2e8f0 !important;
+}
+.badge {
+    display:inline-flex;
+    align-items:center;
+    padding: 0.28rem 0.58rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.badge-good { background: #ecfdf3; color: #166534; }
+.badge-warn { background: #fff7ed; color: #b45309; }
+.badge-risk { background: #fff1f2; color: #b42318; }
+.download-panel {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e5ebf3;
+    border-radius: 24px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+@media (max-width: 900px) {
+    .signal-strip, .insight-grid { grid-template-columns: 1fr; }
+    .executive-title { font-size: 1.45rem; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1187,18 +1374,182 @@ def build_executive_pdf(summary, recommendations_df, sell_in_df, logo_bytes=None
     buffer.seek(0)
     return buffer
 
+
+# =========================================================
+# DISPLAY / NARRATIVE HELPERS
+# =========================================================
+CHART_COLORS = {
+    "navy": "#0b1f33",
+    "blue": "#2563eb",
+    "sky": "#38bdf8",
+    "teal": "#0f766e",
+    "green": "#16a34a",
+    "amber": "#d97706",
+    "rose": "#dc2626",
+    "slate": "#475569",
+}
+
+def format_metric_value(value, kind="number"):
+    try:
+        value = float(value)
+    except Exception:
+        return str(value)
+    if kind == "currency":
+        if abs(value) >= 1_000_000:
+            return f"${value/1_000_000:.1f}M"
+        if abs(value) >= 1_000:
+            return f"${value/1_000:.1f}K"
+        return f"${value:,.0f}"
+    if kind == "pct":
+        return f"{value:.1f}%"
+    if abs(value) >= 1_000_000:
+        return f"{value/1_000_000:.1f}M"
+    if abs(value) >= 1_000:
+        return f"{value/1_000:.1f}K"
+    return f"{value:,.1f}"
+
+def status_badge(text, tone="good"):
+    tone = tone if tone in {"good", "warn", "risk"} else "good"
+    return f"<span class='badge badge-{tone}'>{text}</span>"
+
+
+def apply_pro_theme(fig, title):
+    fig.update_layout(
+        title=dict(text=title, x=0, xanchor="left", font=dict(size=19, color="#0f172a")),
+        height=410,
+        margin=dict(l=20, r=20, t=72, b=24),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#ffffff",
+        font=dict(color="#475467", size=12),
+        hoverlabel=dict(bgcolor="white", font_color="#0f172a"),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            bgcolor="rgba(255,255,255,0.8)",
+            bordercolor="#e5ebf3",
+            borderwidth=1
+        ),
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=True,
+            linecolor="#d9e2ec",
+            tickfont=dict(color="#475467")
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="#eef2f6",
+            gridwidth=1,
+            zeroline=False,
+            showline=False,
+            tickfont=dict(color="#475467")
+        )
+    )
+    fig.update_annotations(font_color="#475467")
+    return fig
+
+def chart_panel(fig):
+    st.markdown("<div class='panel'>", unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_insight_card(title, headline, what_happened, why_it_matters, action):
+    st.markdown(
+        f"""
+        <div class="insight-card">
+            <div class="insight-header">
+                <div>
+                    <div class="insight-kicker">{title}</div>
+                    <div class="insight-headline">{headline}</div>
+                </div>
+                <div class="insight-sub">Executive interpretation</div>
+            </div>
+            <div class="insight-grid">
+                <div class="insight-pill">
+                    <div class="insight-pill-label">What happened</div>
+                    <div class="insight-pill-value">{what_happened}</div>
+                </div>
+                <div class="insight-pill">
+                    <div class="insight-pill-label">Why it matters</div>
+                    <div class="insight-pill-value">{why_it_matters}</div>
+                </div>
+                <div class="insight-pill">
+                    <div class="insight-pill-label">Recommended action</div>
+                    <div class="insight-pill-value">{action}</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def render_kpi_strip(items):
+    cols = st.columns(len(items))
+    for col, item in zip(cols, items):
+        with col:
+            metric_card(item.get("label","Metric"), item.get("value","-"), item.get("sub",""))
+
+def best_row(df, metric, ascending=False):
+    if df is None or len(df) == 0 or metric not in df.columns:
+        return None
+    temp = df.dropna(subset=[metric]).sort_values(metric, ascending=ascending)
+    if len(temp) == 0:
+        return None
+    return temp.iloc[0]
+
+
 # =========================================================
 # DASHBOARD CHART HELPERS
 # =========================================================
-def bar_chart(df, x, y, title, color=None, top_n=10, ascending=False):
+
+def bar_chart(df, x, y, title, color=None, top_n=10, ascending=False, horizontal=True):
     if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
         return None
     temp = df.copy().dropna(subset=[x, y]).sort_values(y, ascending=ascending).head(top_n)
     if len(temp) == 0:
         return None
-    fig = px.bar(temp, x=x, y=y, color=color, title=title, template="plotly_white")
-    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
-    return fig
+
+    palette = [CHART_COLORS["blue"], CHART_COLORS["teal"], CHART_COLORS["amber"], CHART_COLORS["rose"], CHART_COLORS["slate"]]
+
+    if horizontal:
+        temp = temp.sort_values(y, ascending=True)
+        fig = px.bar(
+            temp, x=y, y=x, color=color, orientation="h", template="plotly_white",
+            color_discrete_sequence=palette
+        )
+        if color is None:
+            fig.update_traces(marker_color=CHART_COLORS["blue"])
+        fig.update_traces(
+            texttemplate="%{x:,.1f}",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_color="rgba(255,255,255,0.95)",
+            marker_line_width=1.2,
+            hovertemplate="<b>%{y}</b><br>%{x:,.2f}<extra></extra>"
+        )
+    else:
+        fig = px.bar(
+            temp, x=x, y=y, color=color, template="plotly_white",
+            color_discrete_sequence=palette
+        )
+        if color is None:
+            fig.update_traces(marker_color=CHART_COLORS["blue"])
+        fig.update_traces(
+            texttemplate="%{y:,.1f}",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_color="rgba(255,255,255,0.95)",
+            marker_line_width=1.2,
+            hovertemplate="<b>%{x}</b><br>%{y:,.2f}<extra></extra>"
+        )
+
+    fig.update_layout(bargap=0.28)
+    return apply_pro_theme(fig, title)
+
 
 def line_chart(df, x, y, title, color=None):
     if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
@@ -1206,9 +1557,30 @@ def line_chart(df, x, y, title, color=None):
     temp = df.copy().dropna(subset=[x, y]).sort_values(x)
     if len(temp) == 0:
         return None
-    fig = px.line(temp, x=x, y=y, color=color, title=title, template="plotly_white", markers=True)
-    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
-    return fig
+
+    if color and color in temp.columns:
+        fig = px.line(
+            temp, x=x, y=y, color=color, template="plotly_white", markers=True,
+            color_discrete_sequence=[CHART_COLORS["blue"], CHART_COLORS["teal"], CHART_COLORS["amber"], CHART_COLORS["rose"]]
+        )
+        fig.update_traces(line=dict(width=3), marker=dict(size=6))
+    else:
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=temp[x],
+                y=temp[y],
+                mode="lines+markers",
+                line=dict(width=3, color=CHART_COLORS["blue"], shape="spline", smoothing=0.55),
+                marker=dict(size=6, color="#ffffff", line=dict(width=2, color=CHART_COLORS["blue"])),
+                fill="tozeroy",
+                fillcolor="rgba(29,78,216,0.10)",
+                hovertemplate="<b>%{x}</b><br>%{y:,.2f}<extra></extra>"
+            )
+        )
+    fig.update_layout(hovermode="x unified")
+    return apply_pro_theme(fig, title)
+
 
 def donut_chart(df, names, values, title):
     if df is None or len(df) == 0 or names not in df.columns or values not in df.columns:
@@ -1216,9 +1588,18 @@ def donut_chart(df, names, values, title):
     temp = df.copy().dropna(subset=[names, values])
     if len(temp) == 0:
         return None
-    fig = px.pie(temp, names=names, values=values, hole=0.58, title=title, template="plotly_white")
-    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
-    return fig
+    fig = px.pie(
+        temp, names=names, values=values, hole=0.72, template="plotly_white",
+        color_discrete_sequence=[CHART_COLORS["green"], CHART_COLORS["amber"], CHART_COLORS["rose"], CHART_COLORS["blue"], CHART_COLORS["slate"]]
+    )
+    fig.update_traces(
+        textinfo="percent",
+        textposition="inside",
+        marker=dict(line=dict(color="white", width=2)),
+        hovertemplate="<b>%{label}</b><br>%{value:,.0f} | %{percent}<extra></extra>"
+    )
+    return apply_pro_theme(fig, title)
+
 
 def scatter_chart(df, x, y, title, color=None, hover_name=None, size=None):
     if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
@@ -1226,9 +1607,17 @@ def scatter_chart(df, x, y, title, color=None, hover_name=None, size=None):
     temp = df.copy().dropna(subset=[x, y])
     if len(temp) == 0:
         return None
-    fig = px.scatter(temp, x=x, y=y, color=color, hover_name=hover_name, size=size, title=title, template="plotly_white")
-    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
-    return fig
+    fig = px.scatter(
+        temp, x=x, y=y, color=color, hover_name=hover_name, size=size, template="plotly_white",
+        color_discrete_sequence=[CHART_COLORS["blue"], CHART_COLORS["teal"], CHART_COLORS["amber"], CHART_COLORS["rose"], CHART_COLORS["slate"]],
+        opacity=0.86
+    )
+    fig.update_traces(
+        marker=dict(size=12, line=dict(width=1.4, color="white")),
+        hovertemplate="<b>%{hovertext}</b><br>X: %{x:,.2f}<br>Y: %{y:,.2f}<extra></extra>" if hover_name else None
+    )
+    return apply_pro_theme(fig, title)
+
 
 def heatmap_chart(df, x, y, z, title):
     if df is None or len(df) == 0 or x not in df.columns or y not in df.columns or z not in df.columns:
@@ -1236,12 +1625,28 @@ def heatmap_chart(df, x, y, z, title):
     temp = df.pivot_table(index=y, columns=x, values=z, aggfunc="mean").fillna(0)
     if temp.empty:
         return None
-    fig = go.Figure(data=go.Heatmap(z=temp.values, x=list(temp.columns), y=list(temp.index)))
-    fig.update_layout(title=title, template="plotly_white", height=360, margin=dict(l=20, r=20, t=50, b=20))
-    return fig
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=temp.values,
+            x=list(temp.columns),
+            y=list(temp.index),
+            colorscale=[[0, "#f8fbff"], [0.25, "#dbeafe"], [0.55, "#93c5fd"], [0.8, "#3b82f6"], [1, "#0f172a"]],
+            hoverongaps=False,
+            text=np.round(temp.values, 1),
+            texttemplate="%{text}",
+            colorbar=dict(thickness=14, outlinewidth=0)
+        )
+    )
+    return apply_pro_theme(fig, title)
 
 def build_tab_insight(title, body):
-    st.markdown(f"<div class='panel'><div class='section-title'>{title}</div><div class='small-note' style='font-size:0.95rem;color:#334155'>{body}</div></div>", unsafe_allow_html=True)
+    render_insight_card(
+        title=title,
+        headline=body,
+        what_happened="Performance patterns were ranked and surfaced from the current filtered view.",
+        why_it_matters="This identifies where revenue, distribution, or execution is most at risk.",
+        action="Prioritize the largest gap first and use the table below for store or SKU drill-down."
+    )
 
 def safe_top_value(df, sort_col, ascending=False, label_cols=None):
     if df is None or len(df) == 0 or sort_col not in df.columns:
@@ -1369,9 +1774,44 @@ if run_clicked:
         summary = health.iloc[0]
         pdf_file = build_executive_pdf(summary, recommendations, sell_in, st.session_state.get("logo_bytes"))
         full_results_file = to_excel_download(results, st.session_state.get("logo_bytes"))
-        health_summary_file = build_health_summary_workbook(health, quality, ai_insights, recommendations, st.session_state.get("logo_bytes"))
 
         st.success("Analysis complete.")
+
+        fail_count = int((quality["status"] == "Fail").sum()) if len(quality) else 0
+        warn_count = int((quality["status"] == "Warn").sum()) if len(quality) else 0
+
+        st.markdown(
+            f"""
+            <div class="executive-band">
+                <div class="executive-kicker">Executive command center</div>
+                <div class="executive-title">Boardroom-ready retail performance story</div>
+                <div class="executive-copy">
+                    This redesign elevates the dashboard from simple charts to executive storytelling:
+                    clear signals, cleaner comparisons, and action-oriented interpretation across data quality,
+                    store performance, distribution whitespace, momentum, and shelf productivity.
+                </div>
+                <div class="signal-strip">
+                    <div class="signal-card">
+                        <div class="signal-label">Retail health</div>
+                        <div class="signal-value">{summary['retail_health_score']} | {summary['retail_health_label']}</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-label">Revenue opportunity</div>
+                        <div class="signal-value">${summary['estimated_revenue_opportunity']:,.0f}</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-label">Underperforming stores</div>
+                        <div class="signal-value">{int(summary['underperforming_store_count'])}</div>
+                    </div>
+                    <div class="signal-card">
+                        <div class="signal-label">Data quality risk</div>
+                        <div class="signal-value">{fail_count} fails | {warn_count} warnings</div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         # KPI ROW
         k1, k2, k3, k4, k5 = st.columns(5)
@@ -1380,41 +1820,40 @@ if run_clicked:
         with k2:
             metric_card("Data Quality", f"{summary['data_quality_score']}", summary["data_quality_label"])
         with k3:
-            metric_card("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}", "Opportunity score")
+            metric_card("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}", "Incremental upside")
         with k4:
             metric_card("Avg SPI", f"{summary['avg_store_performance_index']}", f"{int(summary['underperforming_store_count'])} underperforming stores")
         with k5:
-            metric_card("Return Impact", f"{summary['return_impact_score']}%", f"{summary['rows_accepted']} accepted rows")
+            metric_card("Accepted Rows", f"{int(summary['rows_accepted']):,}", f"Return impact {summary['return_impact_score']}%")
 
         st.markdown("### Executive Narrative")
-        left, right = st.columns([1.25, 1])
+        left, right = st.columns([1.4, 1])
 
         with left:
             st.markdown("<div class='ai-box'>", unsafe_allow_html=True)
-            st.markdown("**AI Insights Engine**")
+            st.markdown("**Strategic AI Readout**")
             if len(ai_insights):
-                for _, row in ai_insights.iterrows():
+                for _, row in ai_insights.head(6).iterrows():
                     st.markdown(f"- {row['ai_insight']}")
             else:
                 st.markdown("No AI insights generated.")
             st.markdown("</div>", unsafe_allow_html=True)
 
         with right:
-            fail_count = int((quality["status"] == "Fail").sum()) if len(quality) else 0
-            warn_count = int((quality["status"] == "Warn").sum()) if len(quality) else 0
             st.markdown("<div class='panel'>", unsafe_allow_html=True)
-            st.markdown("**Upload Integrity**")
-            st.markdown(f"- Rows uploaded: **{int(summary['rows_uploaded'])}**")
-            st.markdown(f"- Rows accepted: **{int(summary['rows_accepted'])}**")
-            st.markdown(f"- Rows rejected: **{int(summary['rows_rejected'])}**")
-            st.markdown(f"- Failures: **{fail_count}**")
-            st.markdown(f"- Warnings: **{warn_count}**")
-            st.markdown(f"- Negative units %: **{summary['negative_units_pct']}%**")
-            st.markdown(f"- Negative sales %: **{summary['negative_sales_pct']}%**")
+            st.markdown("<div class='section-title'>Operational Integrity Snapshot</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='small-note'>Rows uploaded <b>{int(summary['rows_uploaded']):,}</b> · accepted <b>{int(summary['rows_accepted']):,}</b> · rejected <b>{int(summary['rows_rejected']):,}</b></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+            st.markdown(f"{status_badge(f'{fail_count} failures', 'risk')} &nbsp; {status_badge(f'{warn_count} warnings', 'warn')} &nbsp; {status_badge(f"{summary['data_quality_label']} quality", 'good' if fail_count == 0 else 'warn')}", unsafe_allow_html=True)
+            st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+            st.markdown(f"- Negative units exposure: **{summary['negative_units_pct']}%**")
+            st.markdown(f"- Negative sales exposure: **{summary['negative_sales_pct']}%**")
+            st.markdown(f"- Avg store performance index: **{summary['avg_store_performance_index']}**")
+            st.markdown(f"- Revenue opportunity score: **{summary['revenue_opportunity_score']}**")
             st.markdown("</div>", unsafe_allow_html=True)
 
         # CHARTS
-        st.markdown("### PowerBI-Style Executive Dashboard")
+        st.markdown("### Executive Performance Lens")
         r1c1, r1c2 = st.columns(2)
         with r1c1:
             if len(underperf):
@@ -1498,6 +1937,7 @@ if run_clicked:
                 st.info("No sell-in opportunities available.")
             st.markdown("</div>", unsafe_allow_html=True)
 
+
         # DETAIL TABS
         tabs = st.tabs([
             "Data Quality",
@@ -1511,46 +1951,68 @@ if run_clicked:
         ])
 
         with tabs[0]:
-            q1, q2, q3 = st.columns(3)
-            q1.metric("Pass Checks", int((quality["status"] == "Pass").sum()) if len(quality) else 0)
-            q2.metric("Warnings", int((quality["status"] == "Warn").sum()) if len(quality) else 0)
-            q3.metric("Failed Checks", int((quality["status"] == "Fail").sum()) if len(quality) else 0)
-            c1, c2 = st.columns(2)
+            pass_checks = int((quality["status"] == "Pass").sum()) if len(quality) else 0
+            warn_checks = int((quality["status"] == "Warn").sum()) if len(quality) else 0
+            fail_checks = int((quality["status"] == "Fail").sum()) if len(quality) else 0
+            render_kpi_strip([
+                {"label": "Quality Score", "value": format_metric_value(summary["quality_score"]), "sub": f"{summary['quality_label']} data readiness"},
+                {"label": "Failed Checks", "value": str(fail_checks), "sub": "Structural blockers to resolve"},
+                {"label": "Warnings", "value": str(warn_checks), "sub": "Items that may distort analysis"},
+            ])
+            c1, c2 = st.columns([1, 1.25])
             with c1:
                 if len(quality):
                     status_mix = quality.groupby("status", dropna=False).size().reset_index(name="count")
-                    fig = donut_chart(status_mix, "status", "count", "Quality Status Mix")
+                    fig = donut_chart(status_mix, "status", "count", "Data Validation Mix")
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
             with c2:
-                fig = bar_chart(quality, "check", "count", "Largest Quality Exceptions", top_n=8)
+                fig = bar_chart(quality, "check", "count", "Most Material Data Exceptions", top_n=8)
                 if fig:
-                    st.plotly_chart(fig, use_container_width=True)
-            build_tab_insight("Insight", f"Biggest data-quality pressure point: {safe_top_value(quality, 'count', ascending=False, label_cols=['check'])}.")
+                    chart_panel(fig)
+            top_issue = best_row(quality, "count", ascending=False)
+            headline = "Data quality is stable." if fail_checks == 0 else "Data quality needs cleanup before broad distribution decisions."
+            what = f"Top issue: {top_issue['check']} ({int(top_issue['count'])})" if top_issue is not None else "No material issue identified."
+            why = f"{fail_checks} failed checks and {warn_checks} warnings can suppress trust in downstream analytics."
+            action = "Resolve failed checks first, then review warnings with the highest record counts."
+            render_insight_card("Data Quality Readout", headline, what, why, action)
             st.dataframe(quality[["check", "status", "count"]], use_container_width=True, hide_index=True)
 
         with tabs[1]:
+            top_store = best_row(underperf, "revenue_opportunity_score", ascending=False)
+            render_kpi_strip([
+                {"label": "Largest Revenue Gap", "value": format_metric_value(top_store["revenue_opportunity_score"], "currency") if top_store is not None else "-", "sub": f"Store {top_store['store_id']}" if top_store is not None else "No store gap"},
+                {"label": "Lowest SPI", "value": format_metric_value(underperf['store_performance_index'].min()) if len(underperf) and 'store_performance_index' in underperf.columns else "-", "sub": "Lowest indexed performer"},
+                {"label": "Stores Flagged", "value": str(len(underperf)), "sub": "Locations needing action"},
+            ])
             c1, c2 = st.columns(2)
             with c1:
                 temp = underperf.copy()
                 if len(temp):
                     temp["store_label"] = temp["store_id"].astype(str)
-                    fig = scatter_chart(temp, "expected_sales", "actual_sales", "Expected vs Actual Sales", color="retailer", hover_name="store_label", size="revenue_opportunity_score")
+                    fig = scatter_chart(temp, "expected_sales", "actual_sales", "Expected vs. Actual Store Sales", color="retailer", hover_name="store_label", size="revenue_opportunity_score")
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        fig.add_shape(type="line", x0=temp["expected_sales"].min(), y0=temp["expected_sales"].min(),
+                                      x1=temp["expected_sales"].max(), y1=temp["expected_sales"].max(),
+                                      line=dict(color="#94a3b8", dash="dash"))
+                        chart_panel(fig)
             with c2:
                 if len(underperf):
                     temp = underperf.copy()
                     temp["store_label"] = temp["store_id"].astype(str)
-                    fig = bar_chart(temp, "store_label", "revenue_opportunity_score", "Top Underperforming Stores", top_n=10)
+                    fig = bar_chart(temp, "store_label", "revenue_opportunity_score", "Highest Revenue Opportunity Stores", top_n=10)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
             heat = None
             if len(results["store_performance_index"]):
-                heat = heatmap_chart(results["store_performance_index"], "retailer", "region", "store_performance_index", "SPI Heatmap by Retailer and Region")
+                heat = heatmap_chart(results["store_performance_index"], "retailer", "region", "store_performance_index", "Store Performance Index by Retailer and Region")
             if heat:
-                st.plotly_chart(heat, use_container_width=True)
-            build_tab_insight("Insight", f"Largest store opportunity sits with {safe_top_value(underperf, 'revenue_opportunity_score', ascending=False, label_cols=['retailer', 'store_id'])}.")
+                chart_panel(heat)
+            headline = "Underperformance is concentrated rather than broad-based."
+            what = f"Primary opportunity sits in {safe_top_value(underperf, 'revenue_opportunity_score', ascending=False, label_cols=['retailer', 'store_id'])}."
+            why = "Stores falling below expected sales represent the cleanest short-term revenue recovery opportunity."
+            action = "Focus field execution, on-shelf availability, and local assortment in the top opportunity stores first."
+            render_insight_card("Store Performance", headline, what, why, action)
             cols = [c for c in [
                 "store_id", "retailer", "region", "actual_sales", "expected_sales",
                 "store_performance_index", "sales_gap", "revenue_opportunity_score",
@@ -1559,21 +2021,31 @@ if run_clicked:
             st.dataframe(underperf[cols], use_container_width=True, hide_index=True)
 
         with tabs[2]:
+            top_vel = best_row(sku, "velocity_units_per_store_per_week", ascending=False)
+            render_kpi_strip([
+                {"label": "Top Velocity SKU", "value": format_metric_value(top_vel["velocity_units_per_store_per_week"]) if top_vel is not None else "-", "sub": f"{top_vel['brand']} | {top_vel['sku_id']}" if top_vel is not None else "No velocity leader"},
+                {"label": "Avg Category Velocity", "value": format_metric_value(sku["category_avg_velocity"].mean()) if len(sku) and "category_avg_velocity" in sku.columns else "-", "sub": "Cross-category benchmark"},
+                {"label": "SKU Count", "value": str(len(sku)), "sub": "Items in current cut"},
+            ])
             c1, c2 = st.columns(2)
             with c1:
                 temp = sku.sort_values("velocity_units_per_store_per_week", ascending=False).head(15).copy() if len(sku) else pd.DataFrame()
                 if len(temp):
                     temp["sku_label"] = temp["sku_id"].astype(str)
-                    fig = bar_chart(temp, "sku_label", "velocity_units_per_store_per_week", "Top SKU Velocity", top_n=15)
+                    fig = bar_chart(temp, "sku_label", "velocity_units_per_store_per_week", "Highest Velocity SKUs", top_n=15)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
             with c2:
                 if len(sku):
                     brand_velocity = sku.groupby("brand", dropna=False)["velocity_units_per_store_per_week"].sum().reset_index().sort_values("velocity_units_per_store_per_week", ascending=False).head(10)
-                    fig = bar_chart(brand_velocity, "brand", "velocity_units_per_store_per_week", "Brand Velocity Contribution", top_n=10)
+                    fig = bar_chart(brand_velocity, "brand", "velocity_units_per_store_per_week", "Brand Contribution to Velocity", top_n=10)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-            build_tab_insight("Insight", f"Fastest velocity item: {safe_top_value(sku, 'velocity_units_per_store_per_week', ascending=False, label_cols=['brand', 'sku_id'])}.")
+                        chart_panel(fig)
+            headline = "Velocity leaders are clear and should anchor assortment decisions."
+            what = f"Fastest item is {safe_top_value(sku, 'velocity_units_per_store_per_week', ascending=False, label_cols=['brand', 'sku_id'])}."
+            why = "High-velocity SKUs typically justify stronger shelf presence and broader distribution support."
+            action = "Protect in-stock, evaluate facings uplift, and use velocity leaders as the benchmark for slower items."
+            render_insight_card("SKU Velocity", headline, what, why, action)
             cols = [c for c in [
                 "sku_id", "brand", "category", "total_units", "active_stores",
                 "velocity_units_per_store_per_week", "category_avg_velocity", "sku_velocity_index"
@@ -1581,21 +2053,31 @@ if run_clicked:
             st.dataframe(sku.sort_values("velocity_units_per_store_per_week", ascending=False)[cols], use_container_width=True, hide_index=True)
 
         with tabs[3]:
+            top_gap = best_row(dist, "distribution_gap_count", ascending=False)
+            render_kpi_strip([
+                {"label": "Largest Gap", "value": format_metric_value(top_gap["distribution_gap_count"]) if top_gap is not None else "-", "sub": f"{top_gap['brand']} | {top_gap['retailer']}" if top_gap is not None else "No major gap"},
+                {"label": "Total Gap Exposure", "value": format_metric_value(dist["distribution_gap_count"].sum()) if len(dist) and "distribution_gap_count" in dist.columns else "-", "sub": "Store opportunities across gaps"},
+                {"label": "Gap Combinations", "value": str(len(dist)), "sub": "Brand-retailer whitespace pairs"},
+            ])
             c1, c2 = st.columns(2)
             with c1:
                 if len(dist):
                     temp = dist.copy()
                     temp["gap_label"] = temp["brand"].astype(str) + " | " + temp["retailer"].astype(str)
-                    fig = bar_chart(temp, "gap_label", "distribution_gap_count", "Top Brand-Retailer Gaps", top_n=12)
+                    fig = bar_chart(temp, "gap_label", "distribution_gap_count", "Largest Brand-Retailer Whitespace", top_n=12)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
             with c2:
                 if len(dist):
                     retailer_gap = dist.groupby("retailer", dropna=False)["distribution_gap_count"].sum().reset_index().sort_values("distribution_gap_count", ascending=False)
-                    fig = bar_chart(retailer_gap, "retailer", "distribution_gap_count", "Retailer Gap Exposure", top_n=10)
+                    fig = bar_chart(retailer_gap, "retailer", "distribution_gap_count", "Retailer Exposure to Distribution Gaps", top_n=10)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-            build_tab_insight("Insight", f"Biggest whitespace sits in {safe_top_value(dist, 'distribution_gap_count', ascending=False, label_cols=['brand', 'retailer'])}.")
+                        chart_panel(fig)
+            headline = "Whitespace remains concentrated in a limited set of brand-retailer combinations."
+            what = f"Largest whitespace is {safe_top_value(dist, 'distribution_gap_count', ascending=False, label_cols=['brand', 'retailer'])}."
+            why = "Distribution gaps are often the fastest route to incremental sales when velocity fundamentals are already healthy."
+            action = "Prioritize sell-in on the highest-gap combinations supported by strong velocity or positive momentum."
+            render_insight_card("Distribution Gaps", headline, what, why, action)
             cols = [c for c in [
                 "brand", "category", "retailer", "current_store_count",
                 "retailer_store_universe", "distribution_gap_count", "distribution_gap_index"
@@ -1604,22 +2086,34 @@ if run_clicked:
 
         with tabs[4]:
             if len(yoy):
+                yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"]).copy()
+                top_yoy = best_row(yoy_clean, "yoy_sales_growth_pct", ascending=False)
+                low_yoy = best_row(yoy_clean, "yoy_sales_growth_pct", ascending=True)
+                render_kpi_strip([
+                    {"label": "Top YoY Winner", "value": format_metric_value(top_yoy["yoy_sales_growth_pct"], "pct") if top_yoy is not None else "-", "sub": f"{top_yoy['brand']} | {top_yoy['sku_id']}" if top_yoy is not None else "No YoY leader"},
+                    {"label": "Biggest Decliner", "value": format_metric_value(low_yoy["yoy_sales_growth_pct"], "pct") if low_yoy is not None else "-", "sub": f"{low_yoy['brand']} | {low_yoy['sku_id']}" if low_yoy is not None else "No decline"},
+                    {"label": "Average YoY", "value": format_metric_value(yoy_clean['yoy_sales_growth_pct'].mean(), "pct") if len(yoy_clean) else "-", "sub": "Portfolio growth average"},
+                ])
                 c1, c2 = st.columns(2)
                 with c1:
-                    temp = yoy.dropna(subset=["yoy_sales_growth_pct"]).sort_values("yoy_sales_growth_pct", ascending=False).head(12).copy()
+                    temp = yoy_clean.sort_values("yoy_sales_growth_pct", ascending=False).head(12).copy()
                     if len(temp):
                         temp["sku_label"] = temp["sku_id"].astype(str)
                         fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Top YoY Winners", top_n=12)
                         if fig:
-                            st.plotly_chart(fig, use_container_width=True)
+                            chart_panel(fig)
                 with c2:
-                    temp = yoy.dropna(subset=["yoy_sales_growth_pct"]).sort_values("yoy_sales_growth_pct", ascending=True).head(12).copy()
+                    temp = yoy_clean.sort_values("yoy_sales_growth_pct", ascending=True).head(12).copy()
                     if len(temp):
                         temp["sku_label"] = temp["sku_id"].astype(str)
-                        fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Top YoY Decliners", top_n=12, ascending=True)
+                        fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Most Material YoY Decliners", top_n=12, ascending=True)
                         if fig:
-                            st.plotly_chart(fig, use_container_width=True)
-                build_tab_insight("Insight", f"Top YoY winner: {safe_top_value(yoy, 'yoy_sales_growth_pct', ascending=False, label_cols=['brand', 'sku_id'])}.")
+                            chart_panel(fig)
+                headline = "Growth is uneven, with a small set of winners offset by notable declines."
+                what = f"Top YoY winner is {safe_top_value(yoy_clean, 'yoy_sales_growth_pct', ascending=False, label_cols=['brand', 'sku_id'])}."
+                why = "A spread between winners and decliners usually points to assortment, distribution, or execution differences rather than category-wide pressure alone."
+                action = "Scale support behind winners and diagnose pricing, facings, or placement for the steepest decliners."
+                render_insight_card("Year-over-Year Growth", headline, what, why, action)
                 cols = [c for c in yoy.columns if c in [
                     "sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct", "exception_flags"
                 ] or c.startswith("sales_") or c.startswith("units_")]
@@ -1629,19 +2123,29 @@ if run_clicked:
 
         with tabs[5]:
             if len(momentum):
+                top_mom = best_row(momentum, "momentum_ratio", ascending=False)
+                render_kpi_strip([
+                    {"label": "Best Momentum", "value": format_metric_value(top_mom["momentum_ratio"]) if top_mom is not None else "-", "sub": f"{top_mom['brand']} | {top_mom['sku_id']}" if top_mom is not None else "No leader"},
+                    {"label": "Trending Up", "value": str(int((momentum["momentum_flag"] == "Trending Up").sum())) if 'momentum_flag' in momentum.columns else "-", "sub": "Positive momentum signals"},
+                    {"label": "Trending Down", "value": str(int((momentum["momentum_flag"] == "Trending Down").sum())) if 'momentum_flag' in momentum.columns else "-", "sub": "Watch-list items"},
+                ])
                 c1, c2 = st.columns(2)
                 with c1:
                     temp = momentum.sort_values("momentum_ratio", ascending=False).head(15).copy()
                     temp["sku_label"] = temp["sku_id"].astype(str)
-                    fig = bar_chart(temp, "sku_label", "momentum_ratio", "Strongest Momentum Movers", color="momentum_flag", top_n=15)
+                    fig = bar_chart(temp, "sku_label", "momentum_ratio", "Strongest Momentum Signals", color="momentum_flag", top_n=15)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
                 with c2:
                     mix = momentum.groupby("momentum_flag", dropna=False).size().reset_index(name="count")
-                    fig = donut_chart(mix, "momentum_flag", "count", "Momentum Flag Mix")
+                    fig = donut_chart(mix, "momentum_flag", "count", "Momentum Signal Mix")
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-                build_tab_insight("Insight", f"Best momentum signal: {safe_top_value(momentum, 'momentum_ratio', ascending=False, label_cols=['brand', 'sku_id'])}.")
+                        chart_panel(fig)
+                headline = "Momentum signals show where recent velocity is accelerating or cooling."
+                what = f"Best momentum signal is {safe_top_value(momentum, 'momentum_ratio', ascending=False, label_cols=['brand', 'sku_id'])}."
+                why = "Momentum often gives an earlier directional read than longer-term growth metrics."
+                action = "Lean into items trending up and review the drivers behind items moving down before distribution expands."
+                render_insight_card("Momentum", headline, what, why, action)
                 cols = [c for c in [
                     "sku_id", "brand", "category", "velocity_13w", "velocity_52w", "momentum_ratio", "momentum_flag"
                 ] if c in momentum.columns]
@@ -1651,25 +2155,35 @@ if run_clicked:
 
         with tabs[6]:
             if len(declines):
+                decline_row = best_row(declines, "wow_change_pct", ascending=True)
+                render_kpi_strip([
+                    {"label": "Largest WoW Decline", "value": format_metric_value(decline_row["wow_change_pct"], "pct") if decline_row is not None else "-", "sub": f"{decline_row['brand']} | {decline_row['sku_id']}" if decline_row is not None else "No decline"},
+                    {"label": "Decline Alerts", "value": str(len(declines)), "sub": "Current flagged SKU-weeks"},
+                    {"label": "Avg Decline", "value": format_metric_value(declines['wow_change_pct'].mean(), "pct") if len(declines) and 'wow_change_pct' in declines.columns else "-", "sub": "Across current watch list"},
+                ])
                 c1, c2 = st.columns(2)
                 with c1:
                     temp = declines.copy()
                     temp["sku_label"] = temp["sku_id"].astype(str)
-                    fig = bar_chart(temp, "sku_label", "wow_change_pct", "Steepest Week-over-Week Declines", top_n=12, ascending=True)
+                    fig = bar_chart(temp, "sku_label", "wow_change_pct", "Most Severe Week-over-Week Declines", top_n=12, ascending=True)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
                 with c2:
-                    top_decline_sku = declines.iloc[0]["sku_id"]
+                    top_decline_sku = decline_row["sku_id"] if decline_row is not None else None
                     sales_base = normalize_columns(sales_history).copy()
                     sales_base["sku_id"] = sales_base["sku_id"].astype(str).str.strip()
                     sales_base["week_end_date"] = pd.to_datetime(sales_base["week_end_date"], errors="coerce")
                     sales_base["sales_dollars"] = pd.to_numeric(sales_base.get("sales_dollars", 0), errors="coerce").fillna(0) if "sales_dollars" in sales_base.columns else 0
                     sales_base = sales_base[sales_base["sku_id"] == str(top_decline_sku)]
                     sku_trend = sales_base.groupby("week_end_date", dropna=False).agg(weekly_sales=("sales_dollars", "sum")).reset_index().dropna()
-                    fig = line_chart(sku_trend, "week_end_date", "weekly_sales", f"Weekly Sales Trend for SKU {top_decline_sku}")
+                    fig = line_chart(sku_trend, "week_end_date", "weekly_sales", f"Weekly Trend for Most Pressured SKU: {top_decline_sku}") if top_decline_sku is not None else None
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-                build_tab_insight("Insight", f"Biggest decline alert: {safe_top_value(declines, 'wow_change_pct', ascending=True, label_cols=['brand', 'sku_id'])}.")
+                        chart_panel(fig)
+                headline = "A focused set of items is showing sharp recent deterioration."
+                what = f"Biggest decline alert is {safe_top_value(declines, 'wow_change_pct', ascending=True, label_cols=['brand', 'sku_id'])}."
+                why = "Rapid week-over-week declines can signal out-of-stocks, lost placement, or local pricing disruption."
+                action = "Validate supply, shelf conditions, and promotional timing on the largest decline items immediately."
+                render_insight_card("Recent Declines", headline, what, why, action)
                 cols = [c for c in [
                     "sku_id", "brand", "category", "week_end_date", "weekly_sales", "prev_week_sales", "wow_change_pct"
                 ] if c in declines.columns]
@@ -1679,18 +2193,28 @@ if run_clicked:
 
         with tabs[7]:
             if len(shelf_df):
+                shelf_top = best_row(shelf_df, "space_efficiency_index", ascending=False)
+                render_kpi_strip([
+                    {"label": "Top SEI", "value": format_metric_value(shelf_top["space_efficiency_index"]) if shelf_top is not None else "-", "sub": f"{shelf_top['retailer']} | {shelf_top['sku_id']}" if shelf_top is not None else "No SEI leader"},
+                    {"label": "Avg Sales / Facing", "value": format_metric_value(shelf_df['sales_per_facing'].mean()) if len(shelf_df) and 'sales_per_facing' in shelf_df.columns else "-", "sub": "Productivity benchmark"},
+                    {"label": "Increase Facing Calls", "value": str(int((shelf_df["shelf_action"] == "Increase Facings").sum())) if 'shelf_action' in shelf_df.columns else "-", "sub": "Potential shelf growth actions"},
+                ])
                 c1, c2 = st.columns(2)
                 with c1:
                     temp = shelf_df.sort_values("space_efficiency_index", ascending=False).head(12).copy()
                     temp["sku_label"] = temp["sku_id"].astype(str)
-                    fig = bar_chart(temp, "sku_label", "space_efficiency_index", "Top Space Efficiency Winners", color="shelf_action", top_n=12)
+                    fig = bar_chart(temp, "sku_label", "space_efficiency_index", "Highest Shelf Productivity Opportunities", color="shelf_action", top_n=12)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        chart_panel(fig)
                 with c2:
-                    fig = scatter_chart(shelf_df, "facings", "total_sales", "Facings vs Sales", color="retailer", hover_name="sku_id", size="space_efficiency_index")
+                    fig = scatter_chart(shelf_df, "facings", "total_sales", "Facings vs. Sales Productivity", color="retailer", hover_name="sku_id", size="space_efficiency_index")
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-                build_tab_insight("Insight", f"Best shelf productivity opportunity: {safe_top_value(shelf_df, 'space_efficiency_index', ascending=False, label_cols=['retailer', 'sku_id'])}.")
+                        chart_panel(fig)
+                headline = "Shelf productivity highlights where space can work harder."
+                what = f"Strongest opportunity is {safe_top_value(shelf_df, 'space_efficiency_index', ascending=False, label_cols=['retailer', 'sku_id'])}."
+                why = "Items outperforming category productivity benchmarks may justify more space, while laggards may require rebalancing."
+                action = "Review facings allocation and reset priorities based on SEI and current sales-per-facing performance."
+                render_insight_card("Shelf Productivity", headline, what, why, action)
                 cols = [c for c in [
                     "store_id", "retailer", "sku_id", "brand", "category", "facings",
                     "total_sales", "total_units", "shelf_productivity_score", "sales_per_facing",
@@ -1699,10 +2223,12 @@ if run_clicked:
                 st.dataframe(shelf_df.sort_values("space_efficiency_index", ascending=False)[cols], use_container_width=True, hide_index=True)
             else:
                 st.info("No shelf file was uploaded, so shelf productivity and SEI were not calculated.")
-
         st.divider()
 
-        d1, d2, d3 = st.columns(3)
+        st.markdown("<div class='download-panel'>", unsafe_allow_html=True)
+        st.markdown("<div class='section-title'>Executive Exports</div>", unsafe_allow_html=True)
+        st.markdown("<div class='small-note'>Download the full analytical workbook or the polished executive PDF report. Logo branding remains embedded in both outputs.</div>", unsafe_allow_html=True)
+        d1, d2 = st.columns(2)
         with d1:
             st.download_button(
                 "Download Full Results Workbook",
@@ -1713,20 +2239,13 @@ if run_clicked:
             )
         with d2:
             st.download_button(
-                "Download Health Summary",
-                health_summary_file,
-                file_name="shelfiq_911_health_summary.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
-        with d3:
-            st.download_button(
                 "Download Executive PDF Report",
                 pdf_file,
                 file_name="shelfiq_911_executive_report.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
+        st.markdown("</div>", unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"Analysis failed: {e}")
