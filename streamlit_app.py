@@ -57,13 +57,13 @@ st.markdown("""
     background:
       radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
       radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
-      linear-gradient(180deg, #091321 0%, #0f1b2d 20%, #e9eef5 20%, #eef3f7 100%);
+      linear-gradient(180deg, #0a1321 0%, #101b2d 22%, #e4ebf3 22%, #e8eef5 100%);
 }
 [data-testid="stAppViewContainer"] {
     background:
       radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
       radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
-      linear-gradient(180deg, #091321 0%, #0f1b2d 20%, #e9eef5 20%, #eef3f7 100%);
+      linear-gradient(180deg, #0a1321 0%, #101b2d 22%, #e4ebf3 22%, #e8eef5 100%);
 }
 .block-container {
     padding-top: 0.8rem;
@@ -119,14 +119,14 @@ div[data-testid="stTabs"] button {
     border-radius: 999px;
     padding: 0.62rem 1.05rem;
     border: 1px solid #d9e2ec;
-    background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+    background: linear-gradient(180deg, #eef3f8 0%, #e4ebf3 100%);
     color: #334155;
     font-weight: 700;
     box-shadow: 0 8px 18px rgba(15,23,42,0.06);
 }
 div[data-testid="stTabs"] button:hover {
     border-color: #cbd8e6;
-    background: white;
+    background: #f3f6fa;
     color: #0f172a;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
@@ -242,7 +242,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     font-weight: 760;
 }
 .metric-card {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    background: linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
     border: 1px solid #dce6f0;
     border-radius: 24px;
     padding: 20px 20px 18px 20px;
@@ -444,7 +444,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 .badge-warn { background: #fff7ed; color: #b45309; }
 .badge-risk { background: #fff1f2; color: #b42318; }
 .download-panel {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    background: linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
     border: 1px solid #dce7f2;
     border-radius: 24px;
     padding: 16px;
@@ -466,10 +466,75 @@ div[data-testid="stDataFrame"] {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 24px rgba(15,23,42,0.06);
-    background: white;
+    background: #f3f6fa;
 }
 div[data-testid="stMetric"] {
     background: transparent;
+}
+
+
+.js-plotly-plot, .plotly, .plot-container {
+    overflow: hidden !important;
+    border-radius: 20px !important;
+}
+[data-testid="stPlotlyChart"] {
+    background: #eef2f7;
+    border: 1px solid #d7e0ea;
+    border-radius: 22px;
+    padding: 10px 10px 2px 10px;
+    box-shadow: 0 8px 22px rgba(15,23,42,0.05);
+    overflow: hidden !important;
+}
+[data-testid="stPlotlyChart"] .modebar {
+    display: none !important;
+}
+.action-card {
+    background: linear-gradient(180deg, #eef3f8 0%, #e4ebf3 100%);
+    border: 1px solid #d9e2ec;
+    border-radius: 24px;
+    padding: 16px 16px 10px 16px;
+    box-shadow: 0 10px 22px rgba(15,23,42,0.05);
+    min-height: 420px;
+}
+.action-title {
+    font-size: 1rem;
+    font-weight: 760;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+.action-copy {
+    color: #667085;
+    font-size: 0.88rem;
+    margin-bottom: 0.8rem;
+}
+.html-table-wrap {
+    background: #f8fafc;
+    border: 1px solid #dbe5ef;
+    border-radius: 18px;
+    overflow: hidden;
+}
+.html-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.html-table-wrap thead th {
+    background: #dfe8f2;
+    color: #0f172a;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.html-table-wrap tbody td {
+    padding: 10px 12px;
+    border-top: 1px solid #e5ebf2;
+    color: #1f2937;
+    vertical-align: top;
+}
+.html-table-wrap tbody tr:nth-child(even) {
+    background: #f4f7fb;
 }
 
 </style>
@@ -929,10 +994,17 @@ def build_recommendations(underperf, dist, yoy, momentum, shelf_df):
 
     if len(dist):
         row = dist.sort_values("distribution_gap_count", ascending=False).iloc[0]
-        recs.append(
-            f"Expand distribution for {row['brand']} / {row['category']} at {row['retailer']}: "
-            f"gap of {int(row['distribution_gap_count'])} stores."
-        )
+        missing_ids = str(row.get("missing_store_ids", "")).strip()
+        if missing_ids:
+            recs.append(
+                f"Expand distribution for {row['brand']} / {row['category']} at {row['retailer']}: "
+                f"gap of {int(row['distribution_gap_count'])} stores. Priority store IDs: {missing_ids}."
+            )
+        else:
+            recs.append(
+                f"Expand distribution for {row['brand']} / {row['category']} at {row['retailer']}: "
+                f"gap of {int(row['distribution_gap_count'])} stores."
+            )
 
     if len(yoy):
         yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"])
@@ -978,7 +1050,10 @@ def build_sell_in_engine(dist, momentum, yoy, shelf_df, underperf):
                 "retailer": row["retailer"],
                 "sku_or_brand": row["brand"],
                 "action": "Expand distribution",
-                "rationale": f"Distribution gap of {int(row['distribution_gap_count'])} stores in {row['retailer']}.",
+                "rationale": (
+                    f"Distribution gap of {int(row['distribution_gap_count'])} stores in {row['retailer']}."
+                    + (f" Priority store IDs: {row.get('missing_store_ids', '')}." if str(row.get('missing_store_ids', '')).strip() else "")
+                ),
                 "estimated_opportunity": np.nan
             })
 
@@ -1230,6 +1305,18 @@ def run_analysis(products, stores, sales_history, shelf=None):
         distribution_gap["retailer_store_universe"].replace(0, np.nan)
     ) * 100
     distribution_gap["distribution_gap_index"] = distribution_gap["distribution_gap_index"].fillna(0)
+
+    retailer_store_map = stores.groupby("retailer", dropna=False)["store_id"].apply(lambda s: sorted(set(s.astype(str)))).to_dict()
+    carried_store_map = carried.groupby(["brand", "category", "retailer"], dropna=False)["store_id"].apply(lambda s: sorted(set(s.astype(str)))).to_dict()
+
+    def _missing_store_ids(row):
+        universe = set(retailer_store_map.get(row["retailer"], []))
+        current = set(carried_store_map.get((row["brand"], row["category"], row["retailer"]), []))
+        missing = sorted(list(universe - current))
+        return ", ".join(missing[:8])
+
+    distribution_gap["missing_store_ids"] = distribution_gap.apply(_missing_store_ids, axis=1)
+    distribution_gap["missing_store_count_preview"] = distribution_gap["missing_store_ids"].apply(lambda x: len([i for i in str(x).split(", ") if i]) if str(x).strip() else 0)
 
     # YoY
     sales_enriched["year"] = sales_enriched["week_end_date"].dt.year
@@ -1692,18 +1779,18 @@ def status_badge(text, tone="good"):
 def apply_pro_theme(fig, title):
     fig.update_layout(
         title=dict(text=title, x=0, xanchor="left", font=dict(size=19, color="#0f172a")),
-        height=410,
-        margin=dict(l=20, r=20, t=72, b=24),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(255,255,255,0.92)",
+        height=390,
+        margin=dict(l=22, r=22, t=56, b=44),
+        paper_bgcolor="#eef2f7",
+        plot_bgcolor="#f2f5f9",
         font=dict(color="#475467", size=12),
         hoverlabel=dict(bgcolor="white", font_color="#0f172a"),
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
+            yanchor="top",
+            y=-0.18,
+            xanchor="center",
+            x=0.5,
             bgcolor="rgba(255,255,255,0.8)",
             bordercolor="#e5ebf3",
             borderwidth=1
@@ -1729,9 +1816,27 @@ def apply_pro_theme(fig, title):
 
 def chart_panel(fig):
     st.markdown("<div class='panel'>", unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
     st.markdown("</div>", unsafe_allow_html=True)
 
+
+
+def render_html_table_card(df, title, subtitle="", columns=None, max_rows=8):
+    st.markdown(f"<div class='action-card'><div class='action-title'>{title}</div><div class='action-copy'>{subtitle}</div>", unsafe_allow_html=True)
+    if df is None or len(df) == 0:
+        st.info("No records available.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+    view = df.copy().head(max_rows)
+    if columns:
+        keep = [c for c in columns if c in view.columns]
+        if keep:
+            view = view[keep]
+    view = view.fillna("")
+    html = view.to_html(index=False, escape=False, classes="html-table-wrap")
+    html = html.replace('border="1"', '')
+    st.markdown(f"<div class='html-table-wrap'>{html}</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 def render_insight_card(title, headline, what_happened, why_it_matters, action):
     st.markdown(
@@ -2146,14 +2251,14 @@ if run_clicked:
                 temp["store_label"] = temp["store_id"].astype(str)
                 fig = bar_chart(temp, "store_label", "revenue_opportunity_score", "Top Store Revenue Opportunities", top_n=10)
                 if fig:
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
         with r1c2:
             if len(dist):
                 temp = dist.copy()
                 temp["gap_label"] = temp["brand"].astype(str) + " | " + temp["retailer"].astype(str)
                 fig = bar_chart(temp, "gap_label", "distribution_gap_count", "Top Distribution Gaps", top_n=10)
                 if fig:
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         r2c1, r2c2 = st.columns(2)
         with r2c1:
@@ -2163,14 +2268,14 @@ if run_clicked:
                     temp["sku_label"] = temp["sku_id"].astype(str)
                     fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Top YoY Growth", top_n=10)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
         with r2c2:
             if len(momentum):
                 temp = momentum.copy()
                 temp["sku_label"] = temp["sku_id"].astype(str)
                 fig = bar_chart(temp, "sku_label", "momentum_ratio", "Top Momentum Movers", top_n=10)
                 if fig:
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         # TREND LINE
         st.markdown("### Trend Lens")
@@ -2200,27 +2305,27 @@ if run_clicked:
         if len(sales_trend):
             fig = line_chart(sales_trend, "week_end_date", "total_sales", "Weekly Sales Trend by Retailer", color="retailer")
             if fig:
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         # ACTION PANELS
         st.markdown("### Action Layer")
         a1, a2 = st.columns(2)
         with a1:
-            st.markdown("<div class='panel'>", unsafe_allow_html=True)
-            st.markdown("<div class='section-title'>Recommendations</div>", unsafe_allow_html=True)
-            if len(recommendations):
-                st.dataframe(recommendations, use_container_width=True, hide_index=True)
-            else:
-                st.info("No recommendations available.")
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_html_table_card(
+                recommendations,
+                "Recommendations",
+                "Priority commercial actions translated into clean, readable callouts.",
+                columns=["recommended_action"],
+                max_rows=8
+            )
         with a2:
-            st.markdown("<div class='panel'>", unsafe_allow_html=True)
-            st.markdown("<div class='section-title'>Sell-In Opportunities</div>", unsafe_allow_html=True)
-            if len(sell_in):
-                st.dataframe(sell_in, use_container_width=True, hide_index=True)
-            else:
-                st.info("No sell-in opportunities available.")
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_html_table_card(
+                sell_in,
+                "Sell-In Opportunities",
+                "Highest-potential placement and expansion opportunities with clearer commercial rationale.",
+                columns=["priority", "retailer", "sku_or_brand", "action", "rationale"],
+                max_rows=8
+            )
 
 
         # DETAIL TABS
