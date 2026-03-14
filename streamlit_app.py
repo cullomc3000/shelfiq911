@@ -34,127 +34,284 @@ LOGO_PATH = "logo.png"
 st.markdown("""
 <style>
 :root {
-    --bg: #f3f5f9;
+    --bg-1: #08111f;
+    --bg-2: #0d1b2a;
+    --bg-3: #111f33;
     --panel: rgba(255,255,255,0.96);
-    --panel-2: #f8fafc;
+    --panel-soft: rgba(255,255,255,0.88);
     --ink: #0f172a;
     --muted: #667085;
-    --line: #e7ecf3;
+    --line: #dbe5ef;
+    --white: #ffffff;
     --navy: #0f172a;
-    --blue: #1d4ed8;
-    --blue-soft: #e8f0ff;
+    --blue: #2563eb;
+    --blue-2: #1d4ed8;
     --teal: #0f766e;
-    --teal-soft: #ecfeff;
     --amber: #b45309;
-    --amber-soft: #fff7ed;
     --rose: #b42318;
-    --rose-soft: #fff1f2;
     --green: #166534;
-    --green-soft: #ecfdf3;
-    --shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 20px 44px rgba(8, 17, 31, 0.16);
+    --shadow-md: 0 12px 28px rgba(8, 17, 31, 0.10);
 }
 .stApp {
     background:
-        radial-gradient(circle at top right, rgba(29,78,216,0.06), transparent 24%),
-        linear-gradient(180deg, #f8fafc 0%, #f3f5f9 100%);
+      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 22%),
+      radial-gradient(circle at top left, rgba(15,118,110,0.12), transparent 20%),
+      linear-gradient(180deg, #0a1324 0%, #101b2e 16%, #eef3f8 16%, #f5f7fb 100%);
 }
 .block-container {
-    padding-top: 1rem;
-    padding-bottom: 1.5rem;
-    max-width: 1560px;
+    padding-top: 1.1rem;
+    padding-bottom: 1.8rem;
+    max-width: 1580px;
 }
 h1, h2, h3 { letter-spacing: -0.02em; }
+section[data-testid="stSidebar"] {
+    background:
+      linear-gradient(180deg, rgba(7,15,28,0.98) 0%, rgba(13,27,42,0.98) 100%);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+section[data-testid="stSidebar"] * {
+    color: #e5edf7 !important;
+}
+section[data-testid="stSidebar"] .stMarkdown p,
+section[data-testid="stSidebar"] .stCaption,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .st-emotion-cache-16txtl3 {
+    color: #d7e3f4 !important;
+}
+section[data-testid="stSidebar"] .stRadio > div,
+section[data-testid="stSidebar"] .stFileUploader,
+section[data-testid="stSidebar"] [data-baseweb="select"],
+section[data-testid="stSidebar"] .stMultiSelect,
+section[data-testid="stSidebar"] .stTextInput > div > div,
+section[data-testid="stSidebar"] .stNumberInput > div > div {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-radius: 18px !important;
+}
+section[data-testid="stSidebar"] .stRadio label {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 8px 10px;
+}
+section[data-testid="stSidebar"] .stButton > button,
+section[data-testid="stSidebar"] .stDownloadButton > button {
+    background: linear-gradient(180deg, #2b6ef3 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    border: 0 !important;
+}
+div[data-testid="stTabs"] {
+    margin-top: 0.25rem;
+}
 div[data-testid="stTabs"] button {
     border-radius: 999px;
-    padding: 0.5rem 0.95rem;
-    border: 1px solid transparent;
-    background: transparent;
-    color: #475467;
-    font-weight: 600;
+    padding: 0.58rem 1rem;
+    border: 1px solid rgba(15,23,42,0.08);
+    background: rgba(255,255,255,0.78);
+    color: #344054;
+    font-weight: 650;
+    box-shadow: 0 3px 10px rgba(15,23,42,0.03);
+}
+div[data-testid="stTabs"] button:hover {
+    border-color: #cbd8e6;
+    background: white;
+    color: #0f172a;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    background: white;
-    border-color: #dbe5f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+    border-color: #c9daf8;
     color: #0f172a;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 8px 22px rgba(37,99,235,0.10);
 }
 .stButton > button, .stDownloadButton > button {
-    border-radius: 14px !important;
-    min-height: 46px;
-    font-weight: 650;
-    border: 1px solid #d7e0eb !important;
-    box-shadow: 0 6px 18px rgba(15,23,42,0.05);
+    border-radius: 15px !important;
+    min-height: 47px;
+    font-weight: 700;
+    border: 1px solid #d6e0eb !important;
+    box-shadow: 0 10px 22px rgba(8,17,31,0.08);
 }
-.metric-card {
-    background: linear-gradient(180deg, #0f172a 0%, #172554 100%);
+.hero-shell {
+    background:
+      radial-gradient(circle at top right, rgba(96,165,250,0.18), transparent 26%),
+      radial-gradient(circle at left center, rgba(45,212,191,0.10), transparent 18%),
+      linear-gradient(135deg, #0b1728 0%, #12233b 52%, #132948 100%);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 24px;
-    padding: 20px 20px 18px 20px;
-    min-height: 126px;
-    box-shadow: 0 18px 38px rgba(15,23,42,0.18);
+    border-radius: 30px;
+    padding: 26px 28px;
+    box-shadow: 0 26px 46px rgba(8,17,31,0.22);
+    margin-bottom: 0.9rem;
 }
-.metric-label {
-    color: #cbd5e1;
+.hero-grid {
+    display: grid;
+    grid-template-columns: 90px 1.5fr 1fr;
+    gap: 20px;
+    align-items: center;
+}
+.hero-logo-wrap {
+    width: 82px;
+    height: 82px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.hero-kicker {
+    color: #8fb7ff;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    font-weight: 780;
+    margin-bottom: 8px;
+}
+.hero-title {
+    color: #ffffff;
+    font-size: 2.15rem;
+    line-height: 1.02;
+    font-weight: 820;
+    margin-bottom: 10px;
+}
+.hero-copy {
+    color: #d7e4f6;
+    font-size: 0.97rem;
+    line-height: 1.58;
+    max-width: 820px;
+}
+.hero-chip-row {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top: 14px;
+}
+.hero-chip {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: #edf4ff;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+.hero-panel {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 16px 16px 14px 16px;
+}
+.hero-panel-title {
+    color: #c9dbf7;
     font-size: 0.76rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 10px;
-}
-.metric-value {
-    color: white;
-    font-size: 2rem;
-    line-height: 1.02;
     font-weight: 760;
 }
+.hero-panel-grid {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.hero-stat {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 10px 12px;
+}
+.hero-stat-label {
+    color: #c9dbf7;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+.hero-stat-value {
+    color: white;
+    font-size: 1rem;
+    font-weight: 760;
+}
+.metric-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dce6f0;
+    border-radius: 24px;
+    padding: 20px 20px 18px 20px;
+    min-height: 128px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+.metric-card:before {
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width: 5px;
+    background: linear-gradient(180deg, #2b6ef3 0%, #0f766e 100%);
+}
+.metric-label {
+    color: #667085;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    margin-bottom: 10px;
+    padding-left: 6px;
+}
+.metric-value {
+    color: #101828;
+    font-size: 1.95rem;
+    line-height: 1.02;
+    font-weight: 800;
+    padding-left: 6px;
+}
 .metric-sub {
-    color: #dbe4f0;
-    font-size: 0.88rem;
+    color: #475467;
+    font-size: 0.9rem;
     margin-top: 10px;
+    padding-left: 6px;
 }
 .panel {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 24px;
     padding: 20px 20px 16px 20px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-md);
 }
 .section-title {
     font-size: 1rem;
-    font-weight: 740;
-    color: var(--ink);
-    margin-bottom: 0.3rem;
+    font-weight: 760;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
 }
 .small-note {
-    color: var(--muted);
-    font-size: 0.88rem;
+    color: #667085;
+    font-size: 0.9rem;
 }
 .executive-band {
-    background: linear-gradient(135deg, #ffffff 0%, #f7faff 55%, #eef4ff 100%);
-    border: 1px solid #dce6f5;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 54%, #eef5ff 100%);
+    border: 1px solid #dce7f5;
     border-radius: 28px;
     padding: 22px 24px;
-    box-shadow: 0 18px 42px rgba(29,78,216,0.06);
-    margin-bottom: 0.9rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 0.95rem;
 }
 .executive-kicker {
-    color: #1d4ed8;
+    color: #2563eb;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-size: 0.72rem;
-    font-weight: 760;
+    font-weight: 780;
     margin-bottom: 8px;
 }
 .executive-title {
     color: #0f172a;
-    font-size: 1.95rem;
-    font-weight: 800;
-    line-height: 1.05;
+    font-size: 1.9rem;
+    font-weight: 820;
+    line-height: 1.04;
     margin-bottom: 10px;
 }
 .executive-copy {
     color: #475467;
     font-size: 0.98rem;
-    line-height: 1.55;
+    line-height: 1.58;
 }
 .signal-strip {
     display: grid;
@@ -163,8 +320,8 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     margin-top: 14px;
 }
 .signal-card {
-    background: rgba(255,255,255,0.8);
-    border: 1px solid #e5ebf3;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid #dfe8f2;
     border-radius: 18px;
     padding: 12px 14px;
 }
@@ -178,15 +335,15 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 .signal-value {
     color: #0f172a;
     font-size: 1rem;
-    font-weight: 740;
+    font-weight: 760;
 }
 .insight-card {
     background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
-    border: 1px solid var(--line);
+    border: 1px solid #e2eaf2;
     border-radius: 24px;
     padding: 18px;
-    box-shadow: var(--shadow);
-    margin: 0.2rem 0 0.9rem 0;
+    box-shadow: var(--shadow-md);
+    margin: 0.2rem 0 0.95rem 0;
 }
 .insight-header {
     display:flex;
@@ -199,17 +356,17 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #1d4ed8;
-    font-weight: 760;
+    color: #2563eb;
+    font-weight: 780;
 }
 .insight-headline {
     font-size: 1.12rem;
-    font-weight: 760;
-    color: var(--ink);
+    font-weight: 780;
+    color: #0f172a;
     margin: 0;
 }
 .insight-sub {
-    color: var(--muted);
+    color: #667085;
     font-size: 0.88rem;
 }
 .insight-grid {
@@ -218,15 +375,15 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     gap: 12px;
 }
 .insight-pill {
-    background: #f8fafc;
-    border: 1px solid #e7ecf3;
+    background: linear-gradient(180deg, #f9fbfd 0%, #f5f8fc 100%);
+    border: 1px solid #e4ebf2;
     border-radius: 18px;
     padding: 14px 14px 12px 14px;
 }
 .insight-pill-label {
     color: #667085;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 720;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 8px;
@@ -234,15 +391,17 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 .insight-pill-value {
     color: #101828;
     font-size: 0.92rem;
-    line-height: 1.45;
+    line-height: 1.5;
 }
 .ai-box {
-    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    background:
+      radial-gradient(circle at top right, rgba(96,165,250,0.15), transparent 26%),
+      linear-gradient(180deg, #0f172a 0%, #15253d 100%);
     border-radius: 24px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.07);
     color: #e2e8f0;
     padding: 20px;
-    box-shadow: 0 18px 38px rgba(15,23,42,0.18);
+    box-shadow: 0 18px 38px rgba(8,17,31,0.18);
 }
 .ai-box ul, .ai-box li, .ai-box p, .ai-box strong {
     color: #e2e8f0 !important;
@@ -250,25 +409,31 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 .badge {
     display:inline-flex;
     align-items:center;
-    padding: 0.28rem 0.58rem;
+    padding: 0.30rem 0.62rem;
     border-radius: 999px;
     font-size: 0.74rem;
-    font-weight: 700;
+    font-weight: 720;
     letter-spacing: 0.02em;
 }
 .badge-good { background: #ecfdf3; color: #166534; }
 .badge-warn { background: #fff7ed; color: #b45309; }
 .badge-risk { background: #fff1f2; color: #b42318; }
 .download-panel {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid #e5ebf3;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dce7f2;
     border-radius: 24px;
     padding: 16px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-md);
 }
-@media (max-width: 900px) {
-    .signal-strip, .insight-grid { grid-template-columns: 1fr; }
-    .executive-title { font-size: 1.45rem; }
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px dashed rgba(255,255,255,0.18) !important;
+}
+@media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .signal-strip, .insight-grid, .hero-panel-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 1.6rem; }
+    .executive-title { font-size: 1.5rem; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -336,19 +501,73 @@ def add_logo_to_sheet(ws, logo_bytes=None, cell="A1", width=135):
 # =========================================================
 # UI HELPERS
 # =========================================================
+
 def render_header(logo_bytes=None):
-    col1, col2 = st.columns([1, 7])
-    with col1:
-        if logo_bytes:
-            st.image(logo_bytes, width=120)
-        elif Path(LOGO_PATH).exists():
-            st.image(LOGO_PATH, width=120)
-    with col2:
-        st.markdown(f"<h1 style='margin-bottom:0'>{APP_TITLE}</h1>", unsafe_allow_html=True)
-        st.markdown(
-            f"<div class='small-note' style='font-size:1rem'>{APP_SUBTITLE}</div>",
-            unsafe_allow_html=True
-        )
+    logo_html = ""
+    if logo_bytes:
+        import base64
+        encoded = base64.b64encode(logo_bytes).decode("utf-8")
+        logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:68px; max-height:68px; border-radius:14px;" />'
+    elif Path(LOGO_PATH).exists():
+        try:
+            import base64
+            encoded = base64.b64encode(Path(LOGO_PATH).read_bytes()).decode("utf-8")
+            logo_html = f'<img src="data:image/png;base64,{encoded}" style="max-width:68px; max-height:68px; border-radius:14px;" />'
+        except Exception:
+            logo_html = '<div style="color:white;font-size:1.6rem;font-weight:800;">SI</div>'
+    else:
+        logo_html = '<div style="color:white;font-size:1.6rem;font-weight:800;">SI</div>'
+
+    st.markdown(
+        f"""
+        <div class="hero-shell">
+            <div class="hero-grid">
+                <div class="hero-logo-wrap">{logo_html}</div>
+                <div>
+                    <div class="hero-kicker">Circana-style retail intelligence</div>
+                    <div class="hero-title">{APP_TITLE}</div>
+                    <div class="hero-copy">
+                        Professional retail analytics with cleaner storytelling across distribution, velocity,
+                        store productivity, quality risk, and growth signals. Built to feel like a modern
+                        insights workspace instead of a basic demo dashboard.
+                    </div>
+                    <div class="hero-chip-row">
+                        <div class="hero-chip">Executive KPI hierarchy</div>
+                        <div class="hero-chip">Sharper trend visuals</div>
+                        <div class="hero-chip">Cleaner risk indicators</div>
+                        <div class="hero-chip">Action-based readouts</div>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="hero-panel-title">What this workspace delivers</div>
+                    <div class="hero-panel-grid">
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">Health</div>
+                            <div class="hero-stat-value">Data + retail quality</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">Signals</div>
+                            <div class="hero-stat-value">Trend + momentum views</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">Gaps</div>
+                            <div class="hero-stat-value">Distribution whitespace</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">Action</div>
+                            <div class="hero-stat-value">Workbook + PDF export</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"<div class='small-note' style='margin:0.15rem 0 0.7rem 0;'>{APP_SUBTITLE}</div>",
+        unsafe_allow_html=True
+    )
 
 def metric_card(label: str, value: str, sub: str = ""):
     st.markdown(
@@ -1466,7 +1685,7 @@ def render_insight_card(title, headline, what_happened, why_it_matters, action):
                     <div class="insight-kicker">{title}</div>
                     <div class="insight-headline">{headline}</div>
                 </div>
-                <div class="insight-sub">Executive interpretation</div>
+                <div class="insight-sub">Business interpretation</div>
             </div>
             <div class="insight-grid">
                 <div class="insight-pill">
@@ -1667,7 +1886,7 @@ if "logo_bytes" not in st.session_state:
     st.session_state["logo_bytes"] = get_logo_bytes()
 
 render_header(st.session_state.get("logo_bytes"))
-st.caption("Upload retail data, validate it, auto-map regions from state, run analysis, and download results.")
+st.caption("Upload your retail files, validate structure, generate executive insights, and export polished outputs.")
 
 with st.sidebar:
     uploaded_logo = st.file_uploader("Upload logo for dashboard + downloads", type=["png", "jpg", "jpeg"])
@@ -1783,12 +2002,10 @@ if run_clicked:
         st.markdown(
             f"""
             <div class="executive-band">
-                <div class="executive-kicker">Executive command center</div>
-                <div class="executive-title">Boardroom-ready retail performance story</div>
+                <div class="executive-kicker">Performance command center</div>
+                <div class="executive-title">Retail performance command story</div>
                 <div class="executive-copy">
-                    This redesign elevates the dashboard from simple charts to executive storytelling:
-                    clear signals, cleaner comparisons, and action-oriented interpretation across data quality,
-                    store performance, distribution whitespace, momentum, and shelf productivity.
+                    This version sharpens the overall experience with stronger KPI hierarchy, cleaner comparisons, easier signal reading, and more professional interpretation across data quality, store performance, whitespace, momentum, and shelf productivity.
                 </div>
                 <div class="signal-strip">
                     <div class="signal-card">
@@ -1831,7 +2048,7 @@ if run_clicked:
 
         with left:
             st.markdown("<div class='ai-box'>", unsafe_allow_html=True)
-            st.markdown("**Strategic AI Readout**")
+            st.markdown("**Insights Summary**")
             if len(ai_insights):
                 for _, row in ai_insights.head(6).iterrows():
                     st.markdown(f"- {row['ai_insight']}")
