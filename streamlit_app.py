@@ -1532,7 +1532,6 @@ def apply_pro_theme(fig, title):
             showline=True,
             linecolor="#314760",
             tickfont=dict(color="#c4d2e2"),
-            titlefont=dict(color="#c4d2e2")
         ),
         yaxis=dict(
             showgrid=True,
@@ -1541,7 +1540,6 @@ def apply_pro_theme(fig, title):
             zeroline=False,
             showline=False,
             tickfont=dict(color="#c4d2e2"),
-            titlefont=dict(color="#c4d2e2")
         )
     )
     fig.update_annotations(font_color="#d7e4f4")
@@ -2387,3 +2385,4 @@ if run_clicked:
 
     except Exception as e:
         st.error(f"Analysis failed: {e}")
+        st.info("A chart rendering setting caused the page to stop. This version includes a compatibility fix for Plotly axis formatting.")
