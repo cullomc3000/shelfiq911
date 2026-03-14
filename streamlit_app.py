@@ -34,220 +34,114 @@ LOGO_PATH = "logo.png"
 st.markdown("""
 <style>
 :root {
-    --bg-1: #08111f;
-    --bg-2: #0d1b2a;
-    --bg-3: #111f33;
-    --panel: rgba(255,255,255,0.96);
-    --panel-soft: rgba(255,255,255,0.88);
-    --ink: #0f172a;
-    --muted: #667085;
-    --line: #dbe5ef;
-    --white: #ffffff;
-    --navy: #0f172a;
-    --blue: #2563eb;
-    --blue-2: #1d4ed8;
-    --teal: #0f766e;
-    --amber: #b45309;
-    --rose: #b42318;
-    --green: #166534;
-    --shadow-lg: 0 20px 44px rgba(8, 17, 31, 0.16);
-    --shadow-md: 0 12px 28px rgba(8, 17, 31, 0.10);
+    --bg-top:#08111d;
+    --bg-mid:#0c1828;
+    --bg-bottom:#121f31;
+    --panel:#111b2b;
+    --panel-2:#162235;
+    --panel-3:#1a2940;
+    --line:#26364f;
+    --line-2:#304562;
+    --text:#eef4fb;
+    --text-2:#c6d3e3;
+    --text-3:#90a4bc;
+    --accent:#78a9ff;
+    --accent-2:#9fc0ff;
+    --shadow:0 14px 34px rgba(0,0,0,0.34);
 }
-.stApp {
-    background:
-      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
-      radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
-      linear-gradient(180deg, #0a1321 0%, #101b2d 22%, #e4ebf3 22%, #e8eef5 100%);
+html, body, [class*="css"] {
+    color: var(--text);
 }
+.stApp,
 [data-testid="stAppViewContainer"] {
     background:
-      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
-      radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
-      linear-gradient(180deg, #0a1321 0%, #101b2d 22%, #e4ebf3 22%, #e8eef5 100%);
+        radial-gradient(circle at top right, rgba(120,169,255,0.08), transparent 16%),
+        radial-gradient(circle at top left, rgba(89,148,255,0.06), transparent 14%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 42%, var(--bg-bottom) 100%);
 }
 .block-container {
-    padding-top: 0.8rem;
-    padding-bottom: 1.8rem;
-    max-width: 1580px;
+    max-width: 1540px;
+    padding-top: 0.65rem;
+    padding-bottom: 1.6rem;
 }
-.block-container {
-    padding-top: 1.1rem;
-    padding-bottom: 1.8rem;
-    max-width: 1580px;
+h1, h2, h3, h4, h5, h6, p, span, label, div {
+    color: var(--text);
 }
-h1, h2, h3 { letter-spacing: -0.02em; }
+small, .small-note, .stCaption, .stMarkdown small {
+    color: var(--text-3) !important;
+}
 section[data-testid="stSidebar"] {
-    background:
-      linear-gradient(180deg, rgba(7,15,28,0.98) 0%, rgba(13,27,42,0.98) 100%);
-    border-right: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, #07101b 0%, #0b1624 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
 }
 section[data-testid="stSidebar"] * {
-    color: #e5edf7 !important;
+    color: var(--text) !important;
 }
-section[data-testid="stSidebar"] .stMarkdown p,
-section[data-testid="stSidebar"] .stCaption,
-section[data-testid="stSidebar"] label,
-section[data-testid="stSidebar"] .st-emotion-cache-16txtl3 {
-    color: #d7e3f4 !important;
-}
-section[data-testid="stSidebar"] .stRadio > div,
 section[data-testid="stSidebar"] .stFileUploader,
 section[data-testid="stSidebar"] [data-baseweb="select"],
-section[data-testid="stSidebar"] .stMultiSelect,
 section[data-testid="stSidebar"] .stTextInput > div > div,
-section[data-testid="stSidebar"] .stNumberInput > div > div {
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
-    border-radius: 18px !important;
-}
-section[data-testid="stSidebar"] .stRadio label {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 8px 10px;
+section[data-testid="stSidebar"] .stNumberInput > div > div,
+section[data-testid="stSidebar"] .stMultiSelect {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 16px !important;
 }
 section[data-testid="stSidebar"] .stButton > button,
 section[data-testid="stSidebar"] .stDownloadButton > button {
-    background: linear-gradient(180deg, #2b6ef3 0%, #1d4ed8 100%) !important;
-    color: white !important;
-    border: 0 !important;
+    background: linear-gradient(180deg, #21406a 0%, #172a46 100%) !important;
+    border: 1px solid #35507a !important;
+    color: #eef4fb !important;
 }
 div[data-testid="stTabs"] {
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
 }
 div[data-testid="stTabs"] button {
     border-radius: 999px;
-    padding: 0.62rem 1.05rem;
-    border: 1px solid #d9e2ec;
-    background: linear-gradient(180deg, #eef3f8 0%, #e4ebf3 100%);
-    color: #334155;
+    padding: 0.62rem 1rem;
+    border: 1px solid #2a3b55;
+    background: linear-gradient(180deg, #121d2d 0%, #0f1827 100%);
+    color: #d7e4f4;
     font-weight: 700;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.06);
+    box-shadow: none;
 }
 div[data-testid="stTabs"] button:hover {
-    border-color: #cbd8e6;
-    background: #f3f6fa;
-    color: #0f172a;
+    background: linear-gradient(180deg, #182538 0%, #142133 100%);
+    color: #ffffff;
+    border-color: #3a5275;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    background: linear-gradient(180deg, #0f172a 0%, #1d4ed8 100%);
-    border-color: #1d4ed8;
+    background: linear-gradient(180deg, #263b59 0%, #1a2b45 100%);
     color: #ffffff;
-    box-shadow: 0 10px 24px rgba(29,78,216,0.24);
+    border-color: #5f84bd;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 22px rgba(0,0,0,0.22);
 }
-.stButton > button, .stDownloadButton > button {
-    border-radius: 15px !important;
-    min-height: 47px;
-    font-weight: 700;
-    border: 1px solid #d6e0eb !important;
-    box-shadow: 0 10px 22px rgba(8,17,31,0.08);
+.hero-shell, .executive-band, .panel, .download-panel, .insight-card, .action-card, .metric-card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%) !important;
+    border: 1px solid var(--line) !important;
+    box-shadow: var(--shadow) !important;
 }
 .hero-shell {
-    background:
-      radial-gradient(circle at top right, rgba(96,165,250,0.18), transparent 26%),
-      radial-gradient(circle at left center, rgba(45,212,191,0.10), transparent 18%),
-      linear-gradient(135deg, #0b1728 0%, #12233b 52%, #132948 100%);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 30px;
-    padding: 26px 28px;
-    box-shadow: 0 26px 46px rgba(8,17,31,0.22);
-    margin-bottom: 0.9rem;
+    border-radius: 28px;
+    padding: 22px 24px;
+    margin-bottom: 0.7rem;
 }
-.hero-grid {
-    display: grid;
-    grid-template-columns: 90px 1.5fr 1fr;
-    gap: 20px;
-    align-items: center;
+.hero-kicker, .executive-kicker, .insight-kicker {
+    color: var(--accent-2) !important;
 }
-.hero-logo-wrap {
-    width: 82px;
-    height: 82px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.08);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border: 1px solid rgba(255,255,255,0.08);
+.hero-title, .executive-title, .section-title, .insight-headline, .action-title {
+    color: #f7fbff !important;
 }
-.hero-kicker {
-    color: #8fb7ff;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.72rem;
-    font-weight: 780;
-    margin-bottom: 8px;
+.hero-copy, .executive-copy, .action-copy, .insight-sub, .metric-sub, .signal-label {
+    color: var(--text-2) !important;
 }
-.hero-title {
-    color: #ffffff;
-    font-size: 2.15rem;
-    line-height: 1.02;
-    font-weight: 820;
-    margin-bottom: 10px;
-}
-.hero-copy {
-    color: #d7e4f6;
-    font-size: 0.97rem;
-    line-height: 1.58;
-    max-width: 820px;
-}
-.hero-chip-row {
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top: 14px;
-}
-.hero-chip {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.09);
-    color: #edf4ff;
-    border-radius: 999px;
-    padding: 8px 12px;
-    font-size: 0.78rem;
-    font-weight: 650;
-}
-.hero-panel {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 22px;
-    padding: 16px 16px 14px 16px;
-}
-.hero-panel-title {
-    color: #c9dbf7;
-    font-size: 0.76rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 10px;
-    font-weight: 760;
-}
-.hero-panel-grid {
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.hero-stat {
-    background: rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 10px 12px;
-}
-.hero-stat-label {
-    color: #c9dbf7;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-}
-.hero-stat-value {
-    color: white;
-    font-size: 1rem;
-    font-weight: 760;
+.hero-chip, .signal-card, .insight-pill {
+    background: linear-gradient(180deg, #18263a 0%, #142133 100%) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--text) !important;
 }
 .metric-card {
-    background: linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
-    border: 1px solid #dce6f0;
-    border-radius: 24px;
-    padding: 20px 20px 18px 20px;
-    min-height: 128px;
-    box-shadow: var(--shadow-md);
+    min-height: 122px;
+    border-radius: 22px;
     position: relative;
     overflow: hidden;
 }
@@ -255,261 +149,65 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     content:"";
     position:absolute;
     left:0; top:0; bottom:0;
-    width: 5px;
-    background: linear-gradient(180deg, #2b6ef3 0%, #0f766e 100%);
+    width:4px;
+    background: linear-gradient(180deg, #8eb5ff 0%, #597dba 100%);
 }
-.metric-label {
-    color: #667085;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.11em;
-    margin-bottom: 10px;
-    padding-left: 6px;
-}
-.metric-value {
-    color: #101828;
-    font-size: 1.95rem;
-    line-height: 1.02;
-    font-weight: 800;
-    padding-left: 6px;
-}
-.metric-sub {
-    color: #475467;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    padding-left: 6px;
-}
-.panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 20px 20px 16px 20px;
-    box-shadow: var(--shadow-md);
-}
-.section-title {
-    font-size: 1rem;
-    font-weight: 760;
-    color: #0f172a;
-    margin-bottom: 0.35rem;
-}
-.small-note {
-    color: #667085;
-    font-size: 0.9rem;
-}
-.executive-band {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 54%, #eef5ff 100%);
-    border: 1px solid #dce7f5;
-    border-radius: 28px;
-    padding: 22px 24px;
-    box-shadow: var(--shadow-md);
-    margin-bottom: 0.65rem;
-}
-.executive-kicker {
-    color: #2563eb;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.72rem;
-    font-weight: 780;
-    margin-bottom: 8px;
-}
-.executive-title {
-    color: #0f172a;
-    font-size: 1.9rem;
-    font-weight: 820;
-    line-height: 1.04;
-    margin-bottom: 10px;
-}
-.executive-copy {
-    color: #475467;
-    font-size: 0.98rem;
-    line-height: 1.58;
-}
-.signal-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0,1fr));
-    gap: 12px;
-    margin-top: 14px;
-}
-.signal-card {
-    background: rgba(255,255,255,0.88);
-    border: 1px solid #dfe8f2;
-    border-radius: 18px;
-    padding: 12px 14px;
-}
-.signal-label {
-    color: #667085;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-}
-.signal-value {
-    color: #0f172a;
-    font-size: 1rem;
-    font-weight: 760;
-}
-.insight-card {
-    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
-    border: 1px solid #e2eaf2;
-    border-radius: 24px;
-    padding: 18px;
-    box-shadow: var(--shadow-md);
-    margin: 0.12rem 0 0.7rem 0;
-}
-.insight-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom: 12px;
-}
-.insight-kicker {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #2563eb;
-    font-weight: 780;
-}
-.insight-headline {
-    font-size: 1.12rem;
-    font-weight: 780;
-    color: #0f172a;
-    margin: 0;
-}
-.insight-sub {
-    color: #667085;
-    font-size: 0.88rem;
-}
-.insight-grid {
-    display:grid;
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    gap: 12px;
-}
-.insight-pill {
-    background: linear-gradient(180deg, #f9fbfd 0%, #f5f8fc 100%);
-    border: 1px solid #e4ebf2;
-    border-radius: 18px;
-    padding: 14px 14px 12px 14px;
-}
-.insight-pill-label {
-    color: #667085;
-    font-size: 0.72rem;
-    font-weight: 720;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-}
-.insight-pill-value {
-    color: #101828;
-    font-size: 0.92rem;
-    line-height: 1.5;
-}
+.metric-label { color: var(--text-3) !important; }
+.metric-value { color: #ffffff !important; }
 .ai-box {
-    background:
-      radial-gradient(circle at top right, rgba(96,165,250,0.18), transparent 26%),
-      linear-gradient(180deg, #0f172a 0%, #15253d 100%);
-    border-radius: 26px;
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #e2e8f0;
-    padding: 22px 22px 18px 22px;
-    box-shadow: 0 18px 38px rgba(8,17,31,0.18);
+    background: linear-gradient(180deg, #101a29 0%, #142337 100%) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 24px;
+    padding: 20px;
+}
+.ai-box *, .panel *, .executive-band *, .hero-shell *, .insight-card *, .action-card * {
+    color: inherit;
 }
 .ai-box ul {
-    margin: 0.6rem 0 0 1rem !important;
+    margin: 0.75rem 0 0 1rem !important;
     padding-left: 1rem !important;
 }
 .ai-box li {
-    color: #edf4ff !important;
+    color: #edf4fb !important;
     font-size: 0.96rem !important;
-    line-height: 1.65 !important;
-    margin-bottom: 0.6rem !important;
+    line-height: 1.7 !important;
+    margin-bottom: 0.62rem !important;
 }
-.ai-box p, .ai-box strong {
-    color: #edf4ff !important;
-}
-.ai-box strong {
-    font-size: 1rem !important;
-    letter-spacing: 0.01em;
-}
-.badge {
-    display:inline-flex;
-    align-items:center;
-    padding: 0.30rem 0.62rem;
-    border-radius: 999px;
-    font-size: 0.74rem;
-    font-weight: 720;
-    letter-spacing: 0.02em;
-}
-.badge-good { background: #ecfdf3; color: #166534; }
-.badge-warn { background: #fff7ed; color: #b45309; }
-.badge-risk { background: #fff1f2; color: #b42318; }
-.download-panel {
-    background: linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
-    border: 1px solid #dce7f2;
-    border-radius: 24px;
-    padding: 16px;
-    box-shadow: var(--shadow-md);
-}
-div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px dashed rgba(255,255,255,0.18) !important;
-}
-@media (max-width: 980px) {
-    .hero-grid { grid-template-columns: 1fr; }
-    .signal-strip, .insight-grid, .hero-panel-grid { grid-template-columns: 1fr; }
-    .hero-title { font-size: 1.6rem; }
-    .executive-title { font-size: 1.5rem; }
-}
-
-div[data-testid="stDataFrame"] {
-    border: 1px solid #dbe5ef;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 24px rgba(15,23,42,0.06);
-    background: #f3f6fa;
-}
-div[data-testid="stMetric"] {
-    background: transparent;
-}
-
-
-.js-plotly-plot, .plotly, .plot-container {
+.badge-good { background: #163024; color: #bcead1; }
+.badge-warn { background: #352917; color: #f4d9a6; }
+.badge-risk { background: #381c21; color: #ffbcc4; }
+.js-plotly-plot, .plotly, .plot-container, [data-testid="stPlotlyChart"] {
     overflow: hidden !important;
-    border-radius: 20px !important;
 }
 [data-testid="stPlotlyChart"] {
-    background: #eef2f7;
-    border: 1px solid #d7e0ea;
+    background: linear-gradient(180deg, #121d2c 0%, #101826 100%);
+    border: 1px solid var(--line);
     border-radius: 22px;
     padding: 10px 10px 2px 10px;
-    box-shadow: 0 8px 22px rgba(15,23,42,0.05);
+    box-shadow: var(--shadow);
+}
+[data-testid="stPlotlyChart"] .modebar { display: none !important; }
+div[data-testid="stDataFrame"] {
+    background: linear-gradient(180deg, #121d2c 0%, #101826 100%) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 18px !important;
     overflow: hidden !important;
+    box-shadow: var(--shadow) !important;
 }
-[data-testid="stPlotlyChart"] .modebar {
-    display: none !important;
+div[data-testid="stDataFrame"] * {
+    color: #edf4fb !important;
 }
-.action-card {
-    background: linear-gradient(180deg, #eef3f8 0%, #e4ebf3 100%);
-    border: 1px solid #d9e2ec;
-    border-radius: 24px;
-    padding: 16px 16px 10px 16px;
-    box-shadow: 0 10px 22px rgba(15,23,42,0.05);
-    min-height: 420px;
+div[data-testid="stDataFrame"] [role="columnheader"] {
+    position: static !important;
+    background: #172437 !important;
+    text-transform: capitalize;
 }
-.action-title {
-    font-size: 1rem;
-    font-weight: 760;
-    color: #0f172a;
-    margin-bottom: 0.35rem;
-}
-.action-copy {
-    color: #667085;
-    font-size: 0.88rem;
-    margin-bottom: 0.8rem;
+div[data-testid="stDataFrame"] [role="gridcell"] {
+    background: #101826 !important;
 }
 .html-table-wrap {
-    background: #f8fafc;
-    border: 1px solid #dbe5ef;
+    background: #101826;
+    border: 1px solid var(--line);
     border-radius: 18px;
     overflow: hidden;
 }
@@ -519,24 +217,28 @@ div[data-testid="stMetric"] {
     font-size: 0.9rem;
 }
 .html-table-wrap thead th {
-    background: #dfe8f2;
-    color: #0f172a;
+    background: #172437;
+    color: #f5f9ff;
     text-align: left;
-    padding: 10px 12px;
-    font-size: 0.76rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    padding: 11px 12px;
+    font-size: 0.78rem;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
 }
 .html-table-wrap tbody td {
     padding: 10px 12px;
-    border-top: 1px solid #e5ebf2;
-    color: #1f2937;
+    border-top: 1px solid #22324a;
+    color: #dfe9f6;
     vertical-align: top;
 }
-.html-table-wrap tbody tr:nth-child(even) {
-    background: #f4f7fb;
-}
-
+.html-table-wrap tbody tr:nth-child(even) { background: #132031; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: #0d1725; }
+::-webkit-scrollbar-thumb { background: #344964; border-radius: 999px; border: 2px solid #0d1725; }
+::-webkit-scrollbar-thumb:hover { background: #4b678d; }
+[data-testid="stVerticalBlock"] { gap: 0.65rem; }
+[data-testid="stHorizontalBlock"] { gap: 0.85rem; }
+.stMarkdown { margin-bottom: 0.15rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1733,6 +1435,35 @@ CHART_COLORS = {
 }
 
 
+
+def prettify_column_name(col):
+    col = str(col).replace("_", " ").strip()
+    pieces = []
+    for token in col.split():
+        if token.lower() in {"id", "spi", "yoy"}:
+            pieces.append(token.upper())
+        elif token.isupper() and len(token) <= 4:
+            pieces.append(token)
+        else:
+            pieces.append(token.capitalize())
+    return " ".join(pieces)
+
+def pretty_df(df, columns=None, max_rows=None):
+    if df is None:
+        return pd.DataFrame()
+    out = df.copy()
+    if columns:
+        keep = [c for c in columns if c in out.columns]
+        out = out[keep]
+    if max_rows:
+        out = out.head(max_rows)
+    out.columns = [prettify_column_name(c) for c in out.columns]
+    return out
+
+def display_df(df, columns=None, max_rows=None):
+    show = pretty_df(df, columns=columns, max_rows=max_rows)
+    st.dataframe(show, use_container_width=True, hide_index=True)
+
 def safe_summary_get(summary, primary_key, fallback_key=None, default=0):
     try:
         if isinstance(summary, dict):
@@ -1776,42 +1507,44 @@ def status_badge(text, tone="good"):
     return f"<span class='badge badge-{tone}'>{text}</span>"
 
 
+
 def apply_pro_theme(fig, title):
     fig.update_layout(
-        title=dict(text=title, x=0, xanchor="left", font=dict(size=19, color="#0f172a")),
-        height=390,
-        margin=dict(l=22, r=22, t=56, b=44),
-        paper_bgcolor="#eef2f7",
-        plot_bgcolor="#f2f5f9",
-        font=dict(color="#475467", size=12),
-        hoverlabel=dict(bgcolor="white", font_color="#0f172a"),
+        title=dict(text=title, x=0, xanchor="left", font=dict(size=20, color="#f5f9ff")),
+        height=395,
+        margin=dict(l=18, r=18, t=54, b=44),
+        paper_bgcolor="#101826",
+        plot_bgcolor="#101826",
+        font=dict(color="#d7e4f4", size=12),
+        hoverlabel=dict(bgcolor="#172437", font_color="#f5f9ff"),
         legend=dict(
             orientation="h",
             yanchor="top",
-            y=-0.18,
+            y=-0.16,
             xanchor="center",
             x=0.5,
-            bgcolor="rgba(255,255,255,0.8)",
-            bordercolor="#e5ebf3",
-            borderwidth=1
+            bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#d7e4f4")
         ),
         xaxis=dict(
             showgrid=False,
             zeroline=False,
             showline=True,
-            linecolor="#d9e2ec",
-            tickfont=dict(color="#475467")
+            linecolor="#314760",
+            tickfont=dict(color="#c4d2e2"),
+            titlefont=dict(color="#c4d2e2")
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor="#eef2f6",
+            gridcolor="#22324a",
             gridwidth=1,
             zeroline=False,
             showline=False,
-            tickfont=dict(color="#475467")
+            tickfont=dict(color="#c4d2e2"),
+            titlefont=dict(color="#c4d2e2")
         )
     )
-    fig.update_annotations(font_color="#475467")
+    fig.update_annotations(font_color="#d7e4f4")
     return fig
 
 def chart_panel(fig):
@@ -1894,7 +1627,7 @@ def bar_chart(df, x, y, title, color=None, top_n=10, ascending=False, horizontal
     if len(temp) == 0:
         return None
 
-    palette = [CHART_COLORS["blue"], CHART_COLORS["teal"], CHART_COLORS["amber"], CHART_COLORS["rose"], CHART_COLORS["slate"]]
+    palette = [CHART_COLORS["blue"], CHART_COLORS["amber"], CHART_COLORS["slate"], "#d2dae6", "#8fa4bf"]
 
     if horizontal:
         temp = temp.sort_values(y, ascending=True)
@@ -1932,6 +1665,7 @@ def bar_chart(df, x, y, title, color=None, top_n=10, ascending=False, horizontal
     return apply_pro_theme(fig, title)
 
 
+
 def line_chart(df, x, y, title, color=None):
     if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
         return None
@@ -1939,23 +1673,28 @@ def line_chart(df, x, y, title, color=None):
     if len(temp) == 0:
         return None
 
+    palette = [CHART_COLORS["blue"], CHART_COLORS["amber"], CHART_COLORS["slate"], "#d2dae6", "#8fa4bf"]
     if color and color in temp.columns:
-        fig = px.line(
-            temp, x=x, y=y, color=color, template="plotly_white", markers=True,
-            color_discrete_sequence=[CHART_COLORS["blue"], CHART_COLORS["teal"], CHART_COLORS["amber"], CHART_COLORS["rose"]]
+        fig = px.area(
+            temp, x=x, y=y, color=color, template="plotly_dark",
+            color_discrete_sequence=palette
         )
-        fig.update_traces(line=dict(width=3), marker=dict(size=6))
+        fig.update_traces(
+            mode="lines",
+            line=dict(width=2.4),
+            opacity=0.78,
+            hovertemplate="<b>%{fullData.name}</b><br>%{x}<br>%{y:,.2f}<extra></extra>"
+        )
     else:
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
                 x=temp[x],
                 y=temp[y],
-                mode="lines+markers",
-                line=dict(width=3, color=CHART_COLORS["blue"], shape="spline", smoothing=0.55),
-                marker=dict(size=6, color="#ffffff", line=dict(width=2, color=CHART_COLORS["blue"])),
+                mode="lines",
+                line=dict(width=2.8, color=CHART_COLORS["blue"]),
                 fill="tozeroy",
-                fillcolor="rgba(29,78,216,0.10)",
+                fillcolor="rgba(120,169,255,0.18)",
                 hovertemplate="<b>%{x}</b><br>%{y:,.2f}<extra></extra>"
             )
         )
@@ -1971,7 +1710,7 @@ def donut_chart(df, names, values, title):
         return None
     fig = px.pie(
         temp, names=names, values=values, hole=0.72, template="plotly_white",
-        color_discrete_sequence=[CHART_COLORS["green"], CHART_COLORS["amber"], CHART_COLORS["rose"], CHART_COLORS["blue"], CHART_COLORS["slate"]]
+        color_discrete_sequence=["#d2dae6", CHART_COLORS["amber"], "#8fa4bf", CHART_COLORS["blue"], CHART_COLORS["slate"]]
     )
     fig.update_traces(
         textinfo="percent",
@@ -2011,7 +1750,7 @@ def heatmap_chart(df, x, y, z, title):
             z=temp.values,
             x=list(temp.columns),
             y=list(temp.index),
-            colorscale=[[0, "#f8fbff"], [0.25, "#dbeafe"], [0.55, "#93c5fd"], [0.8, "#3b82f6"], [1, "#0f172a"]],
+            colorscale=[[0, "#132031"], [0.25, "#203149"], [0.5, "#3a5677"], [0.75, "#7e96b3"], [1, "#dfe8f6"]],
             hoverongaps=False,
             text=np.round(temp.values, 1),
             texttemplate="%{text}",
@@ -2243,7 +1982,7 @@ if run_clicked:
             st.markdown("</div>", unsafe_allow_html=True)
 
         # CHARTS
-        st.markdown("### Executive Performance Lens")
+        st.markdown("### Performance Lens")
         r1c1, r1c2 = st.columns(2)
         with r1c1:
             if len(underperf):
@@ -2308,13 +2047,13 @@ if run_clicked:
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         # ACTION PANELS
-        st.markdown("### Action Layer")
+        st.markdown("### Commercial Action Center")
         a1, a2 = st.columns(2)
         with a1:
             render_html_table_card(
                 recommendations,
                 "Recommendations",
-                "Priority commercial actions translated into clean, readable callouts.",
+                "Cleaner commercial readout with better spacing, higher contrast, and easier prioritization.",
                 columns=["recommended_action"],
                 max_rows=8
             )
@@ -2322,7 +2061,7 @@ if run_clicked:
             render_html_table_card(
                 sell_in,
                 "Sell-In Opportunities",
-                "Highest-potential placement and expansion opportunities with clearer commercial rationale.",
+                "Focused whitespace and sell-in actions with clearer rationale and store-level callouts when available.",
                 columns=["priority", "retailer", "sku_or_brand", "action", "rationale"],
                 max_rows=8
             )
@@ -2342,7 +2081,7 @@ if run_clicked:
         ])
 
         with tabs[0]:
-            st.markdown("<div class='section-title'>Data Quality</div><div class='small-note'>Validate structural readiness and identify the highest-impact exceptions before acting on downstream measures.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Data Quality</div><div class='small-note'>Validate structural readiness and identify the highest-impact exceptions before acting on downstream measures.</div>", unsafe_allow_html=True)
             pass_checks = int((quality["status"] == "Pass").sum()) if len(quality) else 0
             warn_checks = int((quality["status"] == "Warn").sum()) if len(quality) else 0
             fail_checks = int((quality["status"] == "Fail").sum()) if len(quality) else 0
@@ -2368,10 +2107,10 @@ if run_clicked:
             why = f"{fail_checks} failed checks and {warn_checks} warnings can suppress trust in downstream analytics."
             action = "Resolve failed checks first, then review warnings with the highest record counts."
             render_insight_card("Data Quality Readout", headline, what, why, action)
-            st.dataframe(quality[["check", "status", "count"]], use_container_width=True, hide_index=True)
+            display_df(quality, columns=["check", "status", "count"])
 
         with tabs[1]:
-            st.markdown("<div class='section-title'>Store Performance</div><div class='small-note'>Compare expected versus actual store output and prioritize where the commercial gap is greatest.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Store Performance</div><div class='small-note'>Compare expected versus actual store output and prioritize where the commercial gap is greatest.</div>", unsafe_allow_html=True)
             top_store = best_row(underperf, "revenue_opportunity_score", ascending=False)
             render_kpi_strip([
                 {"label": "Largest Revenue Gap", "value": format_metric_value(top_store["revenue_opportunity_score"], "currency") if top_store is not None else "-", "sub": f"Store {top_store['store_id']}" if top_store is not None else "No store gap"},
@@ -2411,10 +2150,10 @@ if run_clicked:
                 "store_performance_index", "sales_gap", "revenue_opportunity_score",
                 "opportunity_priority", "opportunity_confidence", "exception_flags"
             ] if c in underperf.columns]
-            st.dataframe(underperf[cols], use_container_width=True, hide_index=True)
+            display_df(underperf, columns=cols)
 
         with tabs[2]:
-            st.markdown("<div class='section-title'>SKU Velocity</div><div class='small-note'>Surface the fastest and weakest movers to guide assortment, replenishment, and space decisions.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>SKU Velocity</div><div class='small-note'>Surface the fastest and weakest movers to guide assortment, replenishment, and space decisions.</div>", unsafe_allow_html=True)
             top_vel = best_row(sku, "velocity_units_per_store_per_week", ascending=False)
             render_kpi_strip([
                 {"label": "Top Velocity SKU", "value": format_metric_value(top_vel["velocity_units_per_store_per_week"]) if top_vel is not None else "-", "sub": f"{top_vel['brand']} | {top_vel['sku_id']}" if top_vel is not None else "No velocity leader"},
@@ -2444,10 +2183,10 @@ if run_clicked:
                 "sku_id", "brand", "category", "total_units", "active_stores",
                 "velocity_units_per_store_per_week", "category_avg_velocity", "sku_velocity_index"
             ] if c in sku.columns]
-            st.dataframe(sku.sort_values("velocity_units_per_store_per_week", ascending=False)[cols], use_container_width=True, hide_index=True)
+            display_df(sku.sort_values("velocity_units_per_store_per_week", ascending=False), columns=cols)
 
         with tabs[3]:
-            st.markdown("<div class='section-title'>Distribution Gaps</div><div class='small-note'>Pinpoint white space by brand, retailer, and category to support placement and sell-in planning.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Distribution Gaps</div><div class='small-note'>Pinpoint white space by brand, retailer, and category to support placement and sell-in planning.</div>", unsafe_allow_html=True)
             top_gap = best_row(dist, "distribution_gap_count", ascending=False)
             render_kpi_strip([
                 {"label": "Largest Gap", "value": format_metric_value(top_gap["distribution_gap_count"]) if top_gap is not None else "-", "sub": f"{top_gap['brand']} | {top_gap['retailer']}" if top_gap is not None else "No major gap"},
@@ -2477,10 +2216,10 @@ if run_clicked:
                 "brand", "category", "retailer", "current_store_count",
                 "retailer_store_universe", "distribution_gap_count", "distribution_gap_index"
             ] if c in dist.columns]
-            st.dataframe(dist.sort_values("distribution_gap_count", ascending=False)[cols], use_container_width=True, hide_index=True)
+            display_df(dist.sort_values("distribution_gap_count", ascending=False), columns=cols)
 
         with tabs[4]:
-            st.markdown("<div class='section-title'>YoY Growth</div><div class='small-note'>Separate growth leaders from declining items and understand which categories are carrying the business.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>YoY Growth</div><div class='small-note'>Separate growth leaders from declining items and understand which categories are carrying the business.</div>", unsafe_allow_html=True)
             if len(yoy):
                 yoy_clean = yoy.dropna(subset=["yoy_sales_growth_pct"]).copy()
                 top_yoy = best_row(yoy_clean, "yoy_sales_growth_pct", ascending=False)
@@ -2513,12 +2252,12 @@ if run_clicked:
                 cols = [c for c in yoy.columns if c in [
                     "sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct", "exception_flags"
                 ] or c.startswith("sales_") or c.startswith("units_")]
-                st.dataframe(yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last")[cols], use_container_width=True, hide_index=True)
+                display_df(yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last"), columns=cols)
             else:
                 st.info("Not enough history for YoY analysis.")
 
         with tabs[5]:
-            st.markdown("<div class='section-title'>Momentum</div><div class='small-note'>Read near-term directionality to distinguish durable acceleration from weakening trends.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Momentum</div><div class='small-note'>Read near-term directionality to distinguish durable acceleration from weakening trends.</div>", unsafe_allow_html=True)
             if len(momentum):
                 top_mom = best_row(momentum, "momentum_ratio", ascending=False)
                 render_kpi_strip([
@@ -2546,12 +2285,12 @@ if run_clicked:
                 cols = [c for c in [
                     "sku_id", "brand", "category", "velocity_13w", "velocity_52w", "momentum_ratio", "momentum_flag"
                 ] if c in momentum.columns]
-                st.dataframe(momentum.sort_values("momentum_ratio", ascending=False, na_position="last")[cols], use_container_width=True, hide_index=True)
+                display_df(momentum.sort_values("momentum_ratio", ascending=False, na_position="last"), columns=cols)
             else:
                 st.info("Momentum could not be calculated.")
 
         with tabs[6]:
-            st.markdown("<div class='section-title'>Recent Declines</div><div class='small-note'>Highlight short-term erosion and identify which items need immediate review.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Recent Declines</div><div class='small-note'>Highlight short-term erosion and identify which items need immediate review.</div>", unsafe_allow_html=True)
             if len(declines):
                 decline_row = best_row(declines, "wow_change_pct", ascending=True)
                 render_kpi_strip([
@@ -2585,12 +2324,12 @@ if run_clicked:
                 cols = [c for c in [
                     "sku_id", "brand", "category", "week_end_date", "weekly_sales", "prev_week_sales", "wow_change_pct"
                 ] if c in declines.columns]
-                st.dataframe(declines[cols], use_container_width=True, hide_index=True)
+                display_df(declines, columns=cols)
             else:
                 st.info("No recent declines detected.")
 
         with tabs[7]:
-            st.markdown("<div class='section-title'>Shelf Productivity</div><div class='small-note'>Evaluate whether facings and shelf space are translating into productive sales output.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>Shelf Productivity</div><div class='small-note'>Evaluate whether facings and shelf space are translating into productive sales output.</div>", unsafe_allow_html=True)
             if len(shelf_df):
                 shelf_top = best_row(shelf_df, "space_efficiency_index", ascending=False)
                 render_kpi_strip([
@@ -2619,7 +2358,7 @@ if run_clicked:
                     "total_sales", "total_units", "shelf_productivity_score", "sales_per_facing",
                     "category_avg_sales_per_facing", "space_efficiency_index", "shelf_action", "exception_flags"
                 ] if c in shelf_df.columns]
-                st.dataframe(shelf_df.sort_values("space_efficiency_index", ascending=False)[cols], use_container_width=True, hide_index=True)
+                display_df(shelf_df.sort_values("space_efficiency_index", ascending=False), columns=cols)
             else:
                 st.info("No shelf file was uploaded, so shelf productivity and SEI were not calculated.")
         st.divider()
