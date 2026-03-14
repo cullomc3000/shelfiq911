@@ -55,15 +55,20 @@ st.markdown("""
 }
 .stApp {
     background:
-      radial-gradient(circle at top right, rgba(37,99,235,0.12), transparent 18%),
-      radial-gradient(circle at top left, rgba(15,118,110,0.08), transparent 16%),
-      linear-gradient(180deg, #0b1422 0%, #101b2d 14%, #edf2f7 14%, #eef3f7 100%);
+      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
+      radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
+      linear-gradient(180deg, #091321 0%, #0f1b2d 20%, #e9eef5 20%, #eef3f7 100%);
 }
 [data-testid="stAppViewContainer"] {
     background:
-      radial-gradient(circle at top right, rgba(37,99,235,0.12), transparent 18%),
-      radial-gradient(circle at top left, rgba(15,118,110,0.08), transparent 16%),
-      linear-gradient(180deg, #0b1422 0%, #101b2d 14%, #edf2f7 14%, #eef3f7 100%);
+      radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 18%),
+      radial-gradient(circle at top left, rgba(15,118,110,0.10), transparent 16%),
+      linear-gradient(180deg, #091321 0%, #0f1b2d 20%, #e9eef5 20%, #eef3f7 100%);
+}
+.block-container {
+    padding-top: 0.8rem;
+    padding-bottom: 1.8rem;
+    max-width: 1580px;
 }
 .block-container {
     padding-top: 1.1rem;
@@ -297,7 +302,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     border-radius: 28px;
     padding: 22px 24px;
     box-shadow: var(--shadow-md);
-    margin-bottom: 0.95rem;
+    margin-bottom: 0.65rem;
 }
 .executive-kicker {
     color: #2563eb;
@@ -349,7 +354,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     border-radius: 24px;
     padding: 18px;
     box-shadow: var(--shadow-md);
-    margin: 0.2rem 0 0.95rem 0;
+    margin: 0.12rem 0 0.7rem 0;
 }
 .insight-header {
     display:flex;
@@ -401,16 +406,30 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 }
 .ai-box {
     background:
-      radial-gradient(circle at top right, rgba(96,165,250,0.15), transparent 26%),
+      radial-gradient(circle at top right, rgba(96,165,250,0.18), transparent 26%),
       linear-gradient(180deg, #0f172a 0%, #15253d 100%);
-    border-radius: 24px;
-    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.08);
     color: #e2e8f0;
-    padding: 20px;
+    padding: 22px 22px 18px 22px;
     box-shadow: 0 18px 38px rgba(8,17,31,0.18);
 }
-.ai-box ul, .ai-box li, .ai-box p, .ai-box strong {
-    color: #e2e8f0 !important;
+.ai-box ul {
+    margin: 0.6rem 0 0 1rem !important;
+    padding-left: 1rem !important;
+}
+.ai-box li {
+    color: #edf4ff !important;
+    font-size: 0.96rem !important;
+    line-height: 1.65 !important;
+    margin-bottom: 0.6rem !important;
+}
+.ai-box p, .ai-box strong {
+    color: #edf4ff !important;
+}
+.ai-box strong {
+    font-size: 1rem !important;
+    letter-spacing: 0.01em;
 }
 .badge {
     display:inline-flex;
@@ -444,9 +463,10 @@ div[data-testid="stFileUploaderDropzone"] {
 
 div[data-testid="stDataFrame"] {
     border: 1px solid #dbe5ef;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+    box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+    background: white;
 }
 div[data-testid="stMetric"] {
     background: transparent;
@@ -648,7 +668,7 @@ def validate_required_columns(products, stores, sales_history, shelf=None):
             missing["Shelf_Snapshot"] = sorted(list(required_shelf_cols - set(shelf.columns)))
     return missing
 
-def classify_quality_score(score: float) -> str:
+def classify_data_quality_score(score: float) -> str:
     if score >= 95:
         return "Excellent"
     if score >= 85:
@@ -803,7 +823,7 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
         elif row["status"] == "Warn":
             penalty += min(row["count"], 10) * row["severity_weight"] * 0.35
 
-    quality_score = max(0, round(100 - penalty, 1))
+    data_quality_score = max(0, round(100 - penalty, 1))
 
     rejected_mask = (
         sales_history["store_id"].isna() |
@@ -827,8 +847,8 @@ def run_data_quality_checks(products, stores, sales_history, shelf=None):
         "negative_units_pct": negative_units_pct,
         "negative_sales_pct": negative_sales_pct,
         "return_impact_score": return_impact_score,
-        "quality_score": quality_score,
-        "quality_label": classify_quality_score(quality_score),
+        "data_quality_score": data_quality_score,
+        "quality_label": classify_data_quality_score(data_quality_score),
     }
     return quality, meta
 
@@ -1130,8 +1150,8 @@ def run_analysis(products, stores, sales_history, shelf=None):
 
     store_perf["opportunity_confidence"] = np.select(
         [
-            (store_perf["store_performance_index"] < 70) & (quality_meta["quality_score"] >= 85),
-            (store_perf["store_performance_index"] < 85) & (quality_meta["quality_score"] >= 70),
+            (store_perf["store_performance_index"] < 70) & (quality_meta["data_quality_score"] >= 85),
+            (store_perf["store_performance_index"] < 85) & (quality_meta["data_quality_score"] >= 70),
         ],
         ["High", "Medium"],
         default="Low"
@@ -1386,14 +1406,14 @@ def run_analysis(products, stores, sales_history, shelf=None):
     a = min(max(avg_spi, 0), 120) / 120 * 40
     b = (1 - min(max(underperf_rate, 0), 1)) * 15
     c = (1 - min(max(dist_gap_rate / 100, 0), 1)) * 15
-    d = (quality_meta["quality_score"] / 100) * 20
+    d = (quality_meta["data_quality_score"] / 100) * 20
     e = min(quality_meta["return_impact_score"], 10) / 10 * 10
     retail_health_score = round(a + b + c + d + e, 1)
 
     health_summary = pd.DataFrame([{
         "retail_health_score": retail_health_score,
         "retail_health_label": classify_health_score(retail_health_score),
-        "data_quality_score": quality_meta["quality_score"],
+        "data_quality_score": quality_meta["data_quality_score"],
         "data_quality_label": quality_meta["quality_label"],
         "rows_uploaded": quality_meta["rows_uploaded"],
         "rows_accepted": quality_meta["rows_accepted"],
@@ -1625,6 +1645,26 @@ CHART_COLORS = {
     "slate": "#475569",
 }
 
+
+def safe_summary_get(summary, primary_key, fallback_key=None, default=0):
+    try:
+        if isinstance(summary, dict):
+            if primary_key in summary and pd.notna(summary.get(primary_key)):
+                return summary.get(primary_key)
+            if fallback_key and fallback_key in summary and pd.notna(summary.get(fallback_key)):
+                return summary.get(fallback_key)
+        elif hasattr(summary, "get"):
+            val = summary.get(primary_key, None)
+            if pd.notna(val):
+                return val
+            if fallback_key:
+                val2 = summary.get(fallback_key, None)
+                if pd.notna(val2):
+                    return val2
+        return default
+    except Exception:
+        return default
+
 def format_metric_value(value, kind="number"):
     try:
         value = float(value)
@@ -1655,7 +1695,7 @@ def apply_pro_theme(fig, title):
         height=410,
         margin=dict(l=20, r=20, t=72, b=24),
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="#ffffff",
+        plot_bgcolor="rgba(255,255,255,0.92)",
         font=dict(color="#475467", size=12),
         hoverlabel=dict(bgcolor="white", font_color="#0f172a"),
         legend=dict(
@@ -2013,8 +2053,11 @@ if run_clicked:
 
         st.success("Analysis complete.")
 
-        fail_count = int((quality["status"] == "Fail").sum()) if len(quality) else 0
-        warn_count = int((quality["status"] == "Warn").sum()) if len(quality) else 0
+        fail_count = int((quality["status"] == "Fail").sum()) if len(quality) and "status" in quality.columns else 0
+        warn_count = int((quality["status"] == "Warn").sum()) if len(quality) and "status" in quality.columns else 0
+        data_quality_score = safe_summary_get(summary, "data_quality_score", "data_quality_score", 0)
+        quality_label = safe_summary_get(summary, "data_quality_label", "quality_label", "Quality")
+        revenue_oppty = safe_summary_get(summary, "estimated_revenue_opportunity", "revenue_opportunity_score", 0)
 
         st.markdown(
             f"""
@@ -2031,7 +2074,7 @@ if run_clicked:
                     </div>
                     <div class="signal-card">
                         <div class="signal-label">Revenue opportunity</div>
-                        <div class="signal-value">${summary['estimated_revenue_opportunity']:,.0f}</div>
+                        <div class="signal-value">${revenue_oppty:,.0f}</div>
                     </div>
                     <div class="signal-card">
                         <div class="signal-label">Underperforming stores</div>
@@ -2052,9 +2095,9 @@ if run_clicked:
         with k1:
             metric_card("Retail Health", f"{summary['retail_health_score']}", summary["retail_health_label"])
         with k2:
-            metric_card("Data Quality", f"{summary['data_quality_score']}", summary["data_quality_label"])
+            metric_card("Data Quality", f"{data_quality_score}", quality_label)
         with k3:
-            metric_card("Revenue Opportunity", f"${summary['estimated_revenue_opportunity']:,.0f}", "Incremental upside")
+            metric_card("Revenue Opportunity", f"${revenue_oppty:,.0f}", "Incremental upside")
         with k4:
             metric_card("Avg SPI", f"{summary['avg_store_performance_index']}", f"{int(summary['underperforming_store_count'])} underperforming stores")
         with k5:
@@ -2067,8 +2110,15 @@ if run_clicked:
             st.markdown("<div class='ai-box'>", unsafe_allow_html=True)
             st.markdown("**Insights Summary**")
             if len(ai_insights):
+                cleaned_points = []
                 for _, row in ai_insights.head(6).iterrows():
-                    st.markdown(f"- {row['ai_insight']}")
+                    msg = str(row.get('ai_insight', '')).strip()
+                    if msg:
+                        cleaned_points.append(msg)
+                if cleaned_points:
+                    st.markdown("\n".join([f"- {pt}" for pt in cleaned_points]))
+                else:
+                    st.markdown("No AI insights generated.")
             else:
                 st.markdown("No AI insights generated.")
             st.markdown("</div>", unsafe_allow_html=True)
@@ -2078,7 +2128,7 @@ if run_clicked:
             st.markdown("<div class='section-title'>Operational Integrity Snapshot</div>", unsafe_allow_html=True)
             st.markdown(f"<div class='small-note'>Rows uploaded <b>{int(summary['rows_uploaded']):,}</b> · accepted <b>{int(summary['rows_accepted']):,}</b> · rejected <b>{int(summary['rows_rejected']):,}</b></div>", unsafe_allow_html=True)
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-            st.markdown(f"{status_badge(f'{fail_count} failures', 'risk')} &nbsp; {status_badge(f'{warn_count} warnings', 'warn')} &nbsp; {status_badge(f"{summary['data_quality_label']} quality", 'good' if fail_count == 0 else 'warn')}", unsafe_allow_html=True)
+            st.markdown(f"{status_badge(f'{fail_count} failures', 'risk')} &nbsp; {status_badge(f'{warn_count} warnings', 'warn')} &nbsp; {status_badge(f'{quality_label} quality', 'good' if fail_count == 0 else 'warn')}", unsafe_allow_html=True)
             st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
             st.markdown(f"- Negative units exposure: **{summary['negative_units_pct']}%**")
             st.markdown(f"- Negative sales exposure: **{summary['negative_sales_pct']}%**")
@@ -2174,7 +2224,7 @@ if run_clicked:
 
 
         # DETAIL TABS
-        st.markdown("<div class='small-note' style='margin:0.4rem 0 0.8rem 0;'>Detailed measure tabs are below. Scroll slightly if needed to view all sections.</div>", unsafe_allow_html=True)
+        st.markdown("<div class='small-note' style='margin:0.2rem 0 0.55rem 0;'>Detailed measure tabs are below.</div>", unsafe_allow_html=True)
         tabs = st.tabs([
             "Data Quality",
             "Store Performance",
