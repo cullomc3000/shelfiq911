@@ -5,6 +5,9 @@ from io import BytesIO
 from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
+from PIL import Image as PILImage
+from openpyxl.drawing.image import Image as XLImage
+from openpyxl.styles import Font, PatternFill, Alignment
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -104,12 +107,54 @@ STATE_TO_REGION = {
 }
 
 # =========================================================
+# LOGO HELPERS
+# =========================================================
+def get_logo_bytes(uploaded_logo=None):
+    if uploaded_logo is not None:
+        try:
+            return uploaded_logo.getvalue()
+        except Exception:
+            try:
+                uploaded_logo.seek(0)
+                return uploaded_logo.read()
+            except Exception:
+                return None
+    if Path(LOGO_PATH).exists():
+        try:
+            return Path(LOGO_PATH).read_bytes()
+        except Exception:
+            return None
+    return None
+
+def save_logo_bytes(logo_bytes):
+    if logo_bytes:
+        try:
+            Path(LOGO_PATH).write_bytes(logo_bytes)
+        except Exception:
+            pass
+
+def add_logo_to_sheet(ws, logo_bytes=None, cell="A1", width=135):
+    if not logo_bytes:
+        return
+    try:
+        bio = BytesIO(logo_bytes)
+        img = XLImage(bio)
+        ratio = img.height / max(img.width, 1)
+        img.width = width
+        img.height = max(int(width * ratio), 28)
+        ws.add_image(img, cell)
+    except Exception:
+        pass
+
+# =========================================================
 # UI HELPERS
 # =========================================================
-def render_header():
+def render_header(logo_bytes=None):
     col1, col2 = st.columns([1, 7])
     with col1:
-        if Path(LOGO_PATH).exists():
+        if logo_bytes:
+            st.image(logo_bytes, width=120)
+        elif Path(LOGO_PATH).exists():
             st.image(LOGO_PATH, width=120)
     with col2:
         st.markdown(f"<h1 style='margin-bottom:0'>{APP_TITLE}</h1>", unsafe_allow_html=True)
@@ -970,22 +1015,98 @@ def run_analysis(products, stores, sales_history, shelf=None):
 # =========================================================
 # EXPORT HELPERS
 # =========================================================
-def to_excel_download(results_dict):
+def style_workbook_sheet(ws, title=None):
+    header_fill = PatternFill("solid", fgColor="0F172A")
+    header_font = Font(color="FFFFFF", bold=True)
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    if title:
+        ws.insert_rows(1, 3)
+        ws["B2"] = title
+        ws["B2"].font = Font(size=16, bold=True)
+        ws["B3"] = APP_SUBTITLE
+        ws["B3"].font = Font(size=10, italic=True)
+        add_logo_to_sheet(ws, st.session_state.get("logo_bytes"), "A1", width=95)
+        header_row = 4
+        for cell in ws[header_row]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+    for col_cells in ws.columns:
+        length = max(len(str(c.value)) if c.value is not None else 0 for c in col_cells)
+        ws.column_dimensions[col_cells[0].column_letter].width = min(max(length + 2, 12), 36)
+
+def to_excel_download(results_dict, logo_bytes=None):
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         for name, df in results_dict.items():
             if isinstance(df, pd.DataFrame) and len(df) > 0:
                 df.to_excel(writer, sheet_name=name[:31], index=False)
+        workbook = writer.book
+        for ws in workbook.worksheets:
+            add_logo_to_sheet(ws, logo_bytes, "A1", width=95)
+            ws.insert_rows(1, 3)
+            ws["B2"] = f"{APP_TITLE} | {ws.title}"
+            ws["B2"].font = Font(size=16, bold=True)
+            ws["B3"] = APP_SUBTITLE
+            ws["B3"].font = Font(size=10, italic=True)
+            header_fill = PatternFill("solid", fgColor="0F172A")
+            header_font = Font(color="FFFFFF", bold=True)
+            for cell in ws[4]:
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            for col_cells in ws.columns:
+                length = max(len(str(c.value)) if c.value is not None else 0 for c in col_cells)
+                ws.column_dimensions[col_cells[0].column_letter].width = min(max(length + 2, 12), 36)
     output.seek(0)
     return output
 
-def build_executive_pdf(summary, recommendations_df, sell_in_df):
+def build_health_summary_workbook(health_df, quality_df, ai_df, recommendations_df, logo_bytes=None):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        health_df.to_excel(writer, sheet_name="Health_Summary", index=False)
+        if quality_df is not None and len(quality_df):
+            quality_df.to_excel(writer, sheet_name="Quality_Checks", index=False)
+        if ai_df is not None and len(ai_df):
+            ai_df.to_excel(writer, sheet_name="AI_Insights", index=False)
+        if recommendations_df is not None and len(recommendations_df):
+            recommendations_df.to_excel(writer, sheet_name="Recommendations", index=False)
+        workbook = writer.book
+        for ws in workbook.worksheets:
+            add_logo_to_sheet(ws, logo_bytes, "A1", width=95)
+            ws.insert_rows(1, 3)
+            ws["B2"] = f"{APP_TITLE} Health Summary"
+            ws["B2"].font = Font(size=16, bold=True)
+            ws["B3"] = APP_SUBTITLE
+            ws["B3"].font = Font(size=10, italic=True)
+            header_fill = PatternFill("solid", fgColor="0F172A")
+            header_font = Font(color="FFFFFF", bold=True)
+            for cell in ws[4]:
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            for col_cells in ws.columns:
+                length = max(len(str(c.value)) if c.value is not None else 0 for c in col_cells)
+                ws.column_dimensions[col_cells[0].column_letter].width = min(max(length + 2, 12), 36)
+    output.seek(0)
+    return output
+
+def build_executive_pdf(summary, recommendations_df, sell_in_df, logo_bytes=None):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
     y = height - 50
 
-    if Path(LOGO_PATH).exists():
+    if logo_bytes:
+        try:
+            logo = ImageReader(BytesIO(logo_bytes))
+            c.drawImage(logo, 40, y - 20, width=80, preserveAspectRatio=True, mask="auto")
+        except Exception:
+            pass
+    elif Path(LOGO_PATH).exists():
         try:
             logo = ImageReader(LOGO_PATH)
             c.drawImage(logo, 40, y - 20, width=80, preserveAspectRatio=True, mask="auto")
@@ -1029,6 +1150,12 @@ def build_executive_pdf(summary, recommendations_df, sell_in_df):
             if y < 80:
                 c.showPage()
                 y = height - 50
+                if logo_bytes:
+                    try:
+                        logo = ImageReader(BytesIO(logo_bytes))
+                        c.drawImage(logo, 40, y - 20, width=80, preserveAspectRatio=True, mask="auto")
+                    except Exception:
+                        pass
     else:
         c.drawString(50, y, "- No recommendations available.")
         y -= 16
@@ -1047,6 +1174,12 @@ def build_executive_pdf(summary, recommendations_df, sell_in_df):
             if y < 80:
                 c.showPage()
                 y = height - 50
+                if logo_bytes:
+                    try:
+                        logo = ImageReader(BytesIO(logo_bytes))
+                        c.drawImage(logo, 40, y - 20, width=80, preserveAspectRatio=True, mask="auto")
+                    except Exception:
+                        pass
     else:
         c.drawString(50, y, "- No sell-in opportunities available.")
 
@@ -1063,28 +1196,82 @@ def bar_chart(df, x, y, title, color=None, top_n=10, ascending=False):
     temp = df.copy().dropna(subset=[x, y]).sort_values(y, ascending=ascending).head(top_n)
     if len(temp) == 0:
         return None
-    fig = px.bar(
-        temp,
-        x=x,
-        y=y,
-        color=color,
-        title=title,
-        template="plotly_white"
-    )
-    fig.update_layout(
-        height=360,
-        margin=dict(l=20, r=20, t=50, b=20),
-        legend_title_text=""
-    )
+    fig = px.bar(temp, x=x, y=y, color=color, title=title, template="plotly_white")
+    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
     return fig
+
+def line_chart(df, x, y, title, color=None):
+    if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
+        return None
+    temp = df.copy().dropna(subset=[x, y]).sort_values(x)
+    if len(temp) == 0:
+        return None
+    fig = px.line(temp, x=x, y=y, color=color, title=title, template="plotly_white", markers=True)
+    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
+    return fig
+
+def donut_chart(df, names, values, title):
+    if df is None or len(df) == 0 or names not in df.columns or values not in df.columns:
+        return None
+    temp = df.copy().dropna(subset=[names, values])
+    if len(temp) == 0:
+        return None
+    fig = px.pie(temp, names=names, values=values, hole=0.58, title=title, template="plotly_white")
+    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
+    return fig
+
+def scatter_chart(df, x, y, title, color=None, hover_name=None, size=None):
+    if df is None or len(df) == 0 or x not in df.columns or y not in df.columns:
+        return None
+    temp = df.copy().dropna(subset=[x, y])
+    if len(temp) == 0:
+        return None
+    fig = px.scatter(temp, x=x, y=y, color=color, hover_name=hover_name, size=size, title=title, template="plotly_white")
+    fig.update_layout(height=360, margin=dict(l=20, r=20, t=50, b=20), legend_title_text="")
+    return fig
+
+def heatmap_chart(df, x, y, z, title):
+    if df is None or len(df) == 0 or x not in df.columns or y not in df.columns or z not in df.columns:
+        return None
+    temp = df.pivot_table(index=y, columns=x, values=z, aggfunc="mean").fillna(0)
+    if temp.empty:
+        return None
+    fig = go.Figure(data=go.Heatmap(z=temp.values, x=list(temp.columns), y=list(temp.index)))
+    fig.update_layout(title=title, template="plotly_white", height=360, margin=dict(l=20, r=20, t=50, b=20))
+    return fig
+
+def build_tab_insight(title, body):
+    st.markdown(f"<div class='panel'><div class='section-title'>{title}</div><div class='small-note' style='font-size:0.95rem;color:#334155'>{body}</div></div>", unsafe_allow_html=True)
+
+def safe_top_value(df, sort_col, ascending=False, label_cols=None):
+    if df is None or len(df) == 0 or sort_col not in df.columns:
+        return "No standout issue detected."
+    temp = df.dropna(subset=[sort_col]).sort_values(sort_col, ascending=ascending)
+    if len(temp) == 0:
+        return "No standout issue detected."
+    row = temp.iloc[0]
+    if not label_cols:
+        return str(row.get(sort_col, ""))
+    parts = [str(row[c]) for c in label_cols if c in row.index and pd.notna(row[c])]
+    return " | ".join(parts) if parts else str(row.get(sort_col, ""))
 
 # =========================================================
 # APP LAYOUT
 # =========================================================
-render_header()
+if "logo_bytes" not in st.session_state:
+    st.session_state["logo_bytes"] = get_logo_bytes()
+
+render_header(st.session_state.get("logo_bytes"))
 st.caption("Upload retail data, validate it, auto-map regions from state, run analysis, and download results.")
 
 with st.sidebar:
+    uploaded_logo = st.file_uploader("Upload logo for dashboard + downloads", type=["png", "jpg", "jpeg"])
+    if uploaded_logo is not None:
+        st.session_state["logo_bytes"] = get_logo_bytes(uploaded_logo)
+        save_logo_bytes(st.session_state["logo_bytes"])
+        st.success("Logo loaded successfully.")
+    elif st.session_state.get("logo_bytes"):
+        st.caption("Using saved logo for on-screen view and downloads.")
     st.markdown("### Upload Mode")
     upload_mode = st.radio(
         "Choose upload method",
@@ -1180,7 +1367,9 @@ if run_clicked:
         momentum = results["momentum"]
 
         summary = health.iloc[0]
-        pdf_file = build_executive_pdf(summary, recommendations, sell_in)
+        pdf_file = build_executive_pdf(summary, recommendations, sell_in, st.session_state.get("logo_bytes"))
+        full_results_file = to_excel_download(results, st.session_state.get("logo_bytes"))
+        health_summary_file = build_health_summary_workbook(health, quality, ai_insights, recommendations, st.session_state.get("logo_bytes"))
 
         st.success("Analysis complete.")
 
@@ -1259,6 +1448,36 @@ if run_clicked:
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
 
+        # TREND LINE
+        st.markdown("### Trend Lens")
+        sales_trend = pd.DataFrame()
+        if products is not None and stores is not None and sales_history is not None:
+            sales_base = normalize_columns(sales_history).copy()
+            stores_base = prepare_stores(stores)
+            products_base = normalize_columns(products).copy()
+            sales_base["store_id"] = sales_base["store_id"].astype(str).str.strip()
+            sales_base["sku_id"] = sales_base["sku_id"].astype(str).str.strip()
+            sales_base["units"] = pd.to_numeric(sales_base["units"], errors="coerce").fillna(0)
+            if "sales_dollars" in sales_base.columns:
+                sales_base["sales_dollars"] = pd.to_numeric(sales_base["sales_dollars"], errors="coerce").fillna(0)
+            else:
+                sales_base["sales_dollars"] = 0
+            sales_base["week_end_date"] = pd.to_datetime(sales_base["week_end_date"], errors="coerce")
+            sales_trend = (
+                sales_base
+                .merge(products_base[[c for c in ["sku_id", "brand", "category"] if c in products_base.columns]], on="sku_id", how="left")
+                .merge(stores_base[["store_id", "retailer", "region"]], on="store_id", how="left")
+                .groupby(["week_end_date", "retailer"], dropna=False)
+                .agg(total_sales=("sales_dollars", "sum"), total_units=("units", "sum"))
+                .reset_index()
+                .dropna(subset=["week_end_date"])
+            )
+
+        if len(sales_trend):
+            fig = line_chart(sales_trend, "week_end_date", "total_sales", "Weekly Sales Trend by Retailer", color="retailer")
+            if fig:
+                st.plotly_chart(fig, use_container_width=True)
+
         # ACTION PANELS
         st.markdown("### Action Layer")
         a1, a2 = st.columns(2)
@@ -1292,9 +1511,46 @@ if run_clicked:
         ])
 
         with tabs[0]:
+            q1, q2, q3 = st.columns(3)
+            q1.metric("Pass Checks", int((quality["status"] == "Pass").sum()) if len(quality) else 0)
+            q2.metric("Warnings", int((quality["status"] == "Warn").sum()) if len(quality) else 0)
+            q3.metric("Failed Checks", int((quality["status"] == "Fail").sum()) if len(quality) else 0)
+            c1, c2 = st.columns(2)
+            with c1:
+                if len(quality):
+                    status_mix = quality.groupby("status", dropna=False).size().reset_index(name="count")
+                    fig = donut_chart(status_mix, "status", "count", "Quality Status Mix")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                fig = bar_chart(quality, "check", "count", "Largest Quality Exceptions", top_n=8)
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+            build_tab_insight("Insight", f"Biggest data-quality pressure point: {safe_top_value(quality, 'count', ascending=False, label_cols=['check'])}.")
             st.dataframe(quality[["check", "status", "count"]], use_container_width=True, hide_index=True)
 
         with tabs[1]:
+            c1, c2 = st.columns(2)
+            with c1:
+                temp = underperf.copy()
+                if len(temp):
+                    temp["store_label"] = temp["store_id"].astype(str)
+                    fig = scatter_chart(temp, "expected_sales", "actual_sales", "Expected vs Actual Sales", color="retailer", hover_name="store_label", size="revenue_opportunity_score")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                if len(underperf):
+                    temp = underperf.copy()
+                    temp["store_label"] = temp["store_id"].astype(str)
+                    fig = bar_chart(temp, "store_label", "revenue_opportunity_score", "Top Underperforming Stores", top_n=10)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            heat = None
+            if len(results["store_performance_index"]):
+                heat = heatmap_chart(results["store_performance_index"], "retailer", "region", "store_performance_index", "SPI Heatmap by Retailer and Region")
+            if heat:
+                st.plotly_chart(heat, use_container_width=True)
+            build_tab_insight("Insight", f"Largest store opportunity sits with {safe_top_value(underperf, 'revenue_opportunity_score', ascending=False, label_cols=['retailer', 'store_id'])}.")
             cols = [c for c in [
                 "store_id", "retailer", "region", "actual_sales", "expected_sales",
                 "store_performance_index", "sales_gap", "revenue_opportunity_score",
@@ -1303,55 +1559,117 @@ if run_clicked:
             st.dataframe(underperf[cols], use_container_width=True, hide_index=True)
 
         with tabs[2]:
+            c1, c2 = st.columns(2)
+            with c1:
+                temp = sku.sort_values("velocity_units_per_store_per_week", ascending=False).head(15).copy() if len(sku) else pd.DataFrame()
+                if len(temp):
+                    temp["sku_label"] = temp["sku_id"].astype(str)
+                    fig = bar_chart(temp, "sku_label", "velocity_units_per_store_per_week", "Top SKU Velocity", top_n=15)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                if len(sku):
+                    brand_velocity = sku.groupby("brand", dropna=False)["velocity_units_per_store_per_week"].sum().reset_index().sort_values("velocity_units_per_store_per_week", ascending=False).head(10)
+                    fig = bar_chart(brand_velocity, "brand", "velocity_units_per_store_per_week", "Brand Velocity Contribution", top_n=10)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            build_tab_insight("Insight", f"Fastest velocity item: {safe_top_value(sku, 'velocity_units_per_store_per_week', ascending=False, label_cols=['brand', 'sku_id'])}.")
             cols = [c for c in [
                 "sku_id", "brand", "category", "total_units", "active_stores",
-                "velocity_units_per_store_per_week", "sku_velocity_index"
+                "velocity_units_per_store_per_week", "category_avg_velocity", "sku_velocity_index"
             ] if c in sku.columns]
-            st.dataframe(
-                sku.sort_values("velocity_units_per_store_per_week", ascending=False)[cols],
-                use_container_width=True,
-                hide_index=True
-            )
+            st.dataframe(sku.sort_values("velocity_units_per_store_per_week", ascending=False)[cols], use_container_width=True, hide_index=True)
 
         with tabs[3]:
+            c1, c2 = st.columns(2)
+            with c1:
+                if len(dist):
+                    temp = dist.copy()
+                    temp["gap_label"] = temp["brand"].astype(str) + " | " + temp["retailer"].astype(str)
+                    fig = bar_chart(temp, "gap_label", "distribution_gap_count", "Top Brand-Retailer Gaps", top_n=12)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                if len(dist):
+                    retailer_gap = dist.groupby("retailer", dropna=False)["distribution_gap_count"].sum().reset_index().sort_values("distribution_gap_count", ascending=False)
+                    fig = bar_chart(retailer_gap, "retailer", "distribution_gap_count", "Retailer Gap Exposure", top_n=10)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            build_tab_insight("Insight", f"Biggest whitespace sits in {safe_top_value(dist, 'distribution_gap_count', ascending=False, label_cols=['brand', 'retailer'])}.")
             cols = [c for c in [
                 "brand", "category", "retailer", "current_store_count",
                 "retailer_store_universe", "distribution_gap_count", "distribution_gap_index"
             ] if c in dist.columns]
-            st.dataframe(
-                dist.sort_values("distribution_gap_count", ascending=False)[cols],
-                use_container_width=True,
-                hide_index=True
-            )
+            st.dataframe(dist.sort_values("distribution_gap_count", ascending=False)[cols], use_container_width=True, hide_index=True)
 
         with tabs[4]:
             if len(yoy):
+                c1, c2 = st.columns(2)
+                with c1:
+                    temp = yoy.dropna(subset=["yoy_sales_growth_pct"]).sort_values("yoy_sales_growth_pct", ascending=False).head(12).copy()
+                    if len(temp):
+                        temp["sku_label"] = temp["sku_id"].astype(str)
+                        fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Top YoY Winners", top_n=12)
+                        if fig:
+                            st.plotly_chart(fig, use_container_width=True)
+                with c2:
+                    temp = yoy.dropna(subset=["yoy_sales_growth_pct"]).sort_values("yoy_sales_growth_pct", ascending=True).head(12).copy()
+                    if len(temp):
+                        temp["sku_label"] = temp["sku_id"].astype(str)
+                        fig = bar_chart(temp, "sku_label", "yoy_sales_growth_pct", "Top YoY Decliners", top_n=12, ascending=True)
+                        if fig:
+                            st.plotly_chart(fig, use_container_width=True)
+                build_tab_insight("Insight", f"Top YoY winner: {safe_top_value(yoy, 'yoy_sales_growth_pct', ascending=False, label_cols=['brand', 'sku_id'])}.")
                 cols = [c for c in yoy.columns if c in [
                     "sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct", "exception_flags"
                 ] or c.startswith("sales_") or c.startswith("units_")]
-                st.dataframe(
-                    yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last")[cols],
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.dataframe(yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last")[cols], use_container_width=True, hide_index=True)
             else:
                 st.info("Not enough history for YoY analysis.")
 
         with tabs[5]:
             if len(momentum):
+                c1, c2 = st.columns(2)
+                with c1:
+                    temp = momentum.sort_values("momentum_ratio", ascending=False).head(15).copy()
+                    temp["sku_label"] = temp["sku_id"].astype(str)
+                    fig = bar_chart(temp, "sku_label", "momentum_ratio", "Strongest Momentum Movers", color="momentum_flag", top_n=15)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                with c2:
+                    mix = momentum.groupby("momentum_flag", dropna=False).size().reset_index(name="count")
+                    fig = donut_chart(mix, "momentum_flag", "count", "Momentum Flag Mix")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                build_tab_insight("Insight", f"Best momentum signal: {safe_top_value(momentum, 'momentum_ratio', ascending=False, label_cols=['brand', 'sku_id'])}.")
                 cols = [c for c in [
                     "sku_id", "brand", "category", "velocity_13w", "velocity_52w", "momentum_ratio", "momentum_flag"
                 ] if c in momentum.columns]
-                st.dataframe(
-                    momentum.sort_values("momentum_ratio", ascending=False, na_position="last")[cols],
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.dataframe(momentum.sort_values("momentum_ratio", ascending=False, na_position="last")[cols], use_container_width=True, hide_index=True)
             else:
                 st.info("Momentum could not be calculated.")
 
         with tabs[6]:
             if len(declines):
+                c1, c2 = st.columns(2)
+                with c1:
+                    temp = declines.copy()
+                    temp["sku_label"] = temp["sku_id"].astype(str)
+                    fig = bar_chart(temp, "sku_label", "wow_change_pct", "Steepest Week-over-Week Declines", top_n=12, ascending=True)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                with c2:
+                    top_decline_sku = declines.iloc[0]["sku_id"]
+                    sales_base = normalize_columns(sales_history).copy()
+                    sales_base["sku_id"] = sales_base["sku_id"].astype(str).str.strip()
+                    sales_base["week_end_date"] = pd.to_datetime(sales_base["week_end_date"], errors="coerce")
+                    sales_base["sales_dollars"] = pd.to_numeric(sales_base.get("sales_dollars", 0), errors="coerce").fillna(0) if "sales_dollars" in sales_base.columns else 0
+                    sales_base = sales_base[sales_base["sku_id"] == str(top_decline_sku)]
+                    sku_trend = sales_base.groupby("week_end_date", dropna=False).agg(weekly_sales=("sales_dollars", "sum")).reset_index().dropna()
+                    fig = line_chart(sku_trend, "week_end_date", "weekly_sales", f"Weekly Sales Trend for SKU {top_decline_sku}")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                build_tab_insight("Insight", f"Biggest decline alert: {safe_top_value(declines, 'wow_change_pct', ascending=True, label_cols=['brand', 'sku_id'])}.")
                 cols = [c for c in [
                     "sku_id", "brand", "category", "week_end_date", "weekly_sales", "prev_week_sales", "wow_change_pct"
                 ] if c in declines.columns]
@@ -1361,16 +1679,24 @@ if run_clicked:
 
         with tabs[7]:
             if len(shelf_df):
+                c1, c2 = st.columns(2)
+                with c1:
+                    temp = shelf_df.sort_values("space_efficiency_index", ascending=False).head(12).copy()
+                    temp["sku_label"] = temp["sku_id"].astype(str)
+                    fig = bar_chart(temp, "sku_label", "space_efficiency_index", "Top Space Efficiency Winners", color="shelf_action", top_n=12)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                with c2:
+                    fig = scatter_chart(shelf_df, "facings", "total_sales", "Facings vs Sales", color="retailer", hover_name="sku_id", size="space_efficiency_index")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                build_tab_insight("Insight", f"Best shelf productivity opportunity: {safe_top_value(shelf_df, 'space_efficiency_index', ascending=False, label_cols=['retailer', 'sku_id'])}.")
                 cols = [c for c in [
                     "store_id", "retailer", "sku_id", "brand", "category", "facings",
                     "total_sales", "total_units", "shelf_productivity_score", "sales_per_facing",
                     "category_avg_sales_per_facing", "space_efficiency_index", "shelf_action", "exception_flags"
                 ] if c in shelf_df.columns]
-                st.dataframe(
-                    shelf_df.sort_values("space_efficiency_index", ascending=False)[cols],
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.dataframe(shelf_df.sort_values("space_efficiency_index", ascending=False)[cols], use_container_width=True, hide_index=True)
             else:
                 st.info("No shelf file was uploaded, so shelf productivity and SEI were not calculated.")
 
@@ -1380,17 +1706,17 @@ if run_clicked:
         with d1:
             st.download_button(
                 "Download Full Results Workbook",
-                to_excel_download(results),
+                full_results_file,
                 file_name="shelfiq_911_results.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True
             )
         with d2:
             st.download_button(
-                "Download Health Summary CSV",
-                health.to_csv(index=False).encode("utf-8"),
-                file_name="health_summary.csv",
-                mime="text/csv",
+                "Download Health Summary",
+                health_summary_file,
+                file_name="shelfiq_911_health_summary.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True
             )
         with d3:
