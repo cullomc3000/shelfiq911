@@ -2066,7 +2066,8 @@ if run_clicked:
             st.markdown(f"- Negative units exposure: **{summary['negative_units_pct']}%**")
             st.markdown(f"- Negative sales exposure: **{summary['negative_sales_pct']}%**")
             st.markdown(f"- Avg store performance index: **{summary['avg_store_performance_index']}**")
-            st.markdown(f"- Revenue opportunity score: **{summary['revenue_opportunity_score']}**")
+            revenue_oppty = summary.get("estimated_revenue_opportunity", summary.get("revenue_opportunity_score", 0))
+            st.markdown(f"- Revenue opportunity: **${revenue_oppty:,.0f}**")
             st.markdown("</div>", unsafe_allow_html=True)
 
         # CHARTS
@@ -2156,6 +2157,7 @@ if run_clicked:
 
 
         # DETAIL TABS
+        st.markdown("<div class='small-note' style='margin:0.4rem 0 0.8rem 0;'>Detailed measure tabs are below. Scroll slightly if needed to view all sections.</div>", unsafe_allow_html=True)
         tabs = st.tabs([
             "Data Quality",
             "Store Performance",
