@@ -113,10 +113,10 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 }
 .hero-shell {
     border-radius: 28px;
-    padding: 18px 22px;
+    padding: 28px 22px 18px 22px;
     margin-bottom: 0.55rem;
 }
-.hero-grid { display:grid; grid-template-columns: 78px minmax(0,1.7fr) minmax(280px,0.9fr); gap:18px; align-items:start; }
+.hero-grid { display:grid; grid-template-columns: 78px minmax(0,1.7fr) minmax(300px,0.95fr); gap:18px; align-items:start; }
 .hero-logo-wrap {
     width:72px; height:72px; border-radius:18px;
     background: linear-gradient(180deg, #1a2e46 0%, #142437 100%);
@@ -251,7 +251,7 @@ div[data-testid="stDataFrame"] [role="gridcell"] { background: #102033 !importan
     border:1px solid #294564;
 }
 .exec-card-title {
-    font-size:1rem;
+    font-size:1.05rem;
     font-weight:760;
     color:#f5fbff;
     margin-bottom:8px;
@@ -262,6 +262,26 @@ div[data-testid="stDataFrame"] [role="gridcell"] { background: #102033 !importan
     line-height:1.45;
     margin-bottom:12px;
 }
+
+.narrative-block {
+    padding: 2px 2px 2px 2px;
+}
+.narrative-title {
+    font-size: 1.05rem;
+    font-weight: 760;
+    color: #f5fbff;
+    margin-bottom: 10px;
+}
+.narrative-block ul {
+    margin: 0.1rem 0 0 1.15rem !important;
+    padding-left: 0.9rem !important;
+}
+.narrative-block li {
+    margin-bottom: 0.5rem !important;
+    line-height: 1.55 !important;
+    color: #e8f1fb !important;
+}
+
 
 
 [data-testid="stVerticalBlock"] { gap: 0.55rem; }
@@ -361,7 +381,6 @@ def render_header(logo_bytes=None):
             <div class="hero-grid">
                 <div class="hero-logo-wrap">{logo_html}</div>
                 <div>
-                    <div class="hero-kicker">ShelfIQ 911 Retail Intelligence</div>
                     <div class="hero-title">{APP_TITLE}</div>
                     <div class="hero-copy">
                         Retail intelligence across distribution, velocity, productivity, whitespace, and risk — helping teams see where performance is strongest, where issues are emerging, and where action should move first.
@@ -370,7 +389,7 @@ def render_header(logo_bytes=None):
                         <div class="hero-chip">Retail Health</div>
                         <div class="hero-chip">Revenue Opportunity</div>
                         <div class="hero-chip">Trend Signals</div>
-                        <div class="hero-chip">Commercial Actions</div>
+                        <div class="hero-chip">Store Signals</div>
                     </div>
                 </div>
                 <div class="hero-panel">
@@ -1489,7 +1508,9 @@ def pretty_df(df, columns=None, max_rows=None):
 
 def display_df(df, columns=None, max_rows=None, height=360):
     show = pretty_df(df, columns=columns, max_rows=max_rows)
-    st.dataframe(show, use_container_width=True, hide_index=True, height=height)
+    row_count = len(show) if hasattr(show, "__len__") else 0
+    calc_height = min(max(90 + (row_count * 35), 160), height)
+    st.dataframe(show, use_container_width=True, hide_index=True, height=calc_height)
 
 def safe_summary_get(summary, primary_key, fallback_key=None, default=0):
     try:
@@ -1536,6 +1557,26 @@ def status_badge(text, tone="good"):
 
 
 def apply_pro_theme(fig, title):
+    def _pretty_axis_label(label):
+        if label is None:
+            return label
+        label = str(label).replace("_", " ").strip()
+        words = []
+        for token in label.split():
+            if token.lower() in {"id", "spi", "yoy"}:
+                words.append(token.upper())
+            else:
+                words.append(token.capitalize())
+        return " ".join(words)
+
+    try:
+        if getattr(fig.layout.xaxis.title, "text", None):
+            fig.update_xaxes(title_text=_pretty_axis_label(fig.layout.xaxis.title.text))
+        if getattr(fig.layout.yaxis.title, "text", None):
+            fig.update_yaxes(title_text=_pretty_axis_label(fig.layout.yaxis.title.text))
+    except Exception:
+        pass
+
     fig.update_layout(
         title=dict(text=title, x=0, xanchor="left", font=dict(size=20, color="#f5f9ff")),
         height=395,
@@ -1970,8 +2011,7 @@ if run_clicked:
         left, right = st.columns([1.25, 1], gap="large")
 
         with left:
-            st.markdown("<div class='ai-box'>", unsafe_allow_html=True)
-            st.markdown("<div class='exec-card-title'>Insights Summary</div>", unsafe_allow_html=True)
+            st.markdown("<div class='narrative-block'><div class='narrative-title'>Insights Summary</div>", unsafe_allow_html=True)
             if len(ai_insights):
                 cleaned_points = []
                 for _, row in ai_insights.head(6).iterrows():
@@ -2064,27 +2104,6 @@ if run_clicked:
             fig = line_chart(sales_trend, "week_end_date", "total_sales", "Weekly Sales Trend by Retailer", color="retailer")
             if fig:
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
-
-        # ACTION PANELS
-        st.markdown("### Action Center")
-        a1, a2 = st.columns(2)
-        with a1:
-            render_html_table_card(
-                recommendations,
-                "Recommendations",
-                "Top recommended moves based on the strongest revenue, growth, and shelf signals.",
-                columns=["recommended_action"],
-                max_rows=5
-            )
-        with a2:
-            render_html_table_card(
-                sell_in,
-                "Sell-In Opportunities",
-                "Highest-potential placement opportunities with retailer context and store-level callouts where available.",
-                columns=["priority", "retailer", "sku_or_brand", "action", "rationale"],
-                max_rows=5
-            )
-
 
         # DETAIL TABS
         tabs = st.tabs([
@@ -2180,7 +2199,7 @@ if run_clicked:
                 "store_performance_index", "sales_gap", "revenue_opportunity_score",
                 "opportunity_priority", "opportunity_confidence", "exception_flags"
             ] if c in underperf.columns]
-            display_df(underperf, columns=cols)
+            display_df(underperf, columns=cols, height=280)
 
         with tabs[2]:
             st.markdown("<div class='section-title' style='text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem; color:#9fc0ff;'>SKU Velocity</div><div class='small-note'>Surface the fastest and weakest movers to guide assortment, replenishment, and space decisions.</div>", unsafe_allow_html=True)
@@ -2372,14 +2391,17 @@ if run_clicked:
                 ])
                 c1, c2 = st.columns(2)
                 with c1:
-                    temp = shelf_df.sort_values("space_efficiency_index", ascending=False).head(12).copy()
+                    temp = shelf_df.sort_values("space_efficiency_index", ascending=False).head(8).copy()
                     temp["sku_label"] = temp["sku_id"].astype(str)
-                    fig = bar_chart(temp, "sku_label", "space_efficiency_index", "Highest Shelf Productivity Opportunities", color="shelf_action", top_n=12)
+                    fig = bar_chart(temp, "sku_label", "space_efficiency_index", "Top Shelf Productivity Opportunities", top_n=8)
                     if fig:
+                        fig.update_xaxes(title_text="Space Efficiency Index")
+                        fig.update_yaxes(title_text="")
+                        fig.update_layout(showlegend=False)
                         chart_panel(fig)
                 with c2:
                     shelf_action_view = shelf_df.groupby("shelf_action", dropna=False)["space_efficiency_index"].mean().reset_index().sort_values("space_efficiency_index", ascending=False)
-                    fig = bar_chart(shelf_action_view, "shelf_action", "space_efficiency_index", "Average Productivity by Shelf Action", top_n=10, horizontal=True)
+                    fig = bar_chart(shelf_action_view, "shelf_action", "space_efficiency_index", "Average Productivity by Action", top_n=10, horizontal=True)
                     if fig:
                         fig.update_xaxes(title_text="Average Space Efficiency Index")
                         fig.update_yaxes(title_text="")
@@ -2397,8 +2419,6 @@ if run_clicked:
                 display_df(shelf_df.sort_values("space_efficiency_index", ascending=False), columns=cols, height=380)
             else:
                 st.info("No shelf file was uploaded, so shelf productivity and SEI were not calculated.")
-        st.divider()
-
         st.markdown("<div class='download-panel'>", unsafe_allow_html=True)
         st.markdown("<div class='section-title'>Executive Exports</div>", unsafe_allow_html=True)
         st.markdown("<div class='small-note'>Download the full analytical workbook or the polished executive PDF report. Logo branding remains embedded in both outputs.</div>", unsafe_allow_html=True)
