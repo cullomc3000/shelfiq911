@@ -103,7 +103,9 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     box-shadow: 0 8px 20px rgba(0,0,0,0.22);
 }
 
-.hero-shell, .executive-band, .panel, .download-panel, .insight-card, .action-card, .metric-card {
+.hero-shell, .executive-band, .panel, .download-panel { padding-top:18px !important; margin-top:10px !important; }
+.download-panel .small-note { margin-bottom:12px !important; display:block; }
+.download-panel, .insight-card, .action-card, .metric-card {
     background: linear-gradient(180deg, #102033 0%, #15304a 100%) !important;
     border: 1px solid #2a4666 !important;
     box-shadow: var(--shadow) !important;
@@ -114,7 +116,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
     padding: 18px 22px;
     margin-bottom: 0.55rem;
 }
-.hero-grid { display:grid; grid-template-columns: 78px 1.5fr 1fr; gap:18px; align-items:start; }
+.hero-grid { display:grid; grid-template-columns: 78px minmax(0,1.7fr) minmax(280px,0.9fr); gap:18px; align-items:start; }
 .hero-logo-wrap {
     width:72px; height:72px; border-radius:18px;
     background: linear-gradient(180deg, #1a2e46 0%, #142437 100%);
@@ -138,7 +140,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 .hero-stat-value { color:#f5fbff; font-weight:700; font-size:0.92rem; }
 
 .executive-band { border-radius: 24px; padding: 16px 18px; margin-bottom: 0.6rem; }
-.signal-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:10px; }
+.signal-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:6px; }
 .signal-card { border-radius:18px; padding:10px 12px; }
 .signal-value { color:#fff !important; font-size:1.05rem; font-weight:780; }
 
@@ -215,24 +217,25 @@ div[data-testid="stDataFrame"] [role="columnheader"] {
 div[data-testid="stDataFrame"] [role="gridcell"] { background: #102033 !important; }
 
 .html-table-wrap { background: #102033; border: 1px solid #294564; border-radius: 16px; overflow: hidden; }
-.html-table-wrap table { width:100%; border-collapse:collapse; font-size:0.92rem; }
+.html-table-wrap { flex:1; overflow:auto; }
+.html-table-wrap table { width:100%; border-collapse:collapse; font-size:0.92rem; table-layout:fixed; }
 .html-table-wrap thead th {
     background:#1a2f48; color:#f5f9ff; text-align:left; padding:10px 12px;
     font-size:0.8rem; text-transform:capitalize; letter-spacing:0.02em;
 }
 .html-table-wrap tbody td {
     padding:10px 12px; border-top:1px solid #223853; color:#dfe9f6; vertical-align:top;
-    line-height:1.3;
+    line-height:1.3; overflow-wrap:anywhere; word-break:break-word;
 }
 .html-table-wrap tbody tr:nth-child(even) { background:#13273e; }
 
-.insight-card { padding: 15px 16px; border-radius:22px; }
+.insight-card { padding: 16px 16px 14px 16px; border-radius:22px; }
 .insight-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
 .insight-pill { padding:12px 13px; border-radius:16px; min-height:118px; }
 .insight-pill-label { color:#9db7d5 !important; font-size:0.7rem !important; letter-spacing:0.05em !important; text-transform:uppercase; }
 .insight-pill-value { color:#eef5ff !important; font-size:0.94rem !important; line-height:1.45 !important; }
 
-.action-card { padding:14px; border-radius:22px; min-height: 340px; }
+.action-card { padding:16px; border-radius:22px; min-height: 420px; display:flex; flex-direction:column; }
 .action-title { font-size: 1rem; font-weight: 760; margin-bottom: 0.25rem; }
 .action-copy { font-size: 0.86rem; margin-bottom: 0.7rem; }
 
@@ -240,12 +243,32 @@ div[data-testid="stDataFrame"] [role="gridcell"] { background: #102033 !importan
 ::-webkit-scrollbar-track { background: #0d1725; }
 ::-webkit-scrollbar-thumb { background: #4d72a6; border-radius: 999px; border: 2px solid #0d1725; }
 ::-webkit-scrollbar-thumb:hover { background: #6c90c5; }
+.table-scroll-frame {
+    overflow-x:auto;
+    overflow-y:auto;
+    max-width:100%;
+    border-radius:16px;
+    border:1px solid #294564;
+}
+.exec-card-title {
+    font-size:1rem;
+    font-weight:760;
+    color:#f5fbff;
+    margin-bottom:8px;
+}
+.exec-card-sub {
+    color:#bcd0e6;
+    font-size:0.9rem;
+    line-height:1.45;
+    margin-bottom:12px;
+}
+
 
 [data-testid="stVerticalBlock"] { gap: 0.55rem; }
 [data-testid="stHorizontalBlock"] { gap: 0.75rem; }
 .stMarkdown { margin-bottom: 0.1rem !important; }
 
-@media (max-width: 980px) {
+@media (max-width: 1150px) {
     .hero-grid, .signal-strip, .insight-grid, .hero-panel-grid { grid-template-columns: 1fr !important; }
 }
 </style>
@@ -341,9 +364,7 @@ def render_header(logo_bytes=None):
                     <div class="hero-kicker">ShelfIQ 911 Retail Intelligence</div>
                     <div class="hero-title">{APP_TITLE}</div>
                     <div class="hero-copy">
-                        Retail signal tracking for distribution, velocity, productivity, whitespace, and risk —
-                        designed to help teams spot where performance is strongest, where issues are emerging,
-                        and where commercial action should move first.
+                        Retail intelligence across distribution, velocity, productivity, whitespace, and risk — helping teams see where performance is strongest, where issues are emerging, and where action should move first.
                     </div>
                     <div class="hero-chip-row">
                         <div class="hero-chip">Retail Health</div>
@@ -1466,9 +1487,9 @@ def pretty_df(df, columns=None, max_rows=None):
     out.columns = [prettify_column_name(c) for c in out.columns]
     return out
 
-def display_df(df, columns=None, max_rows=None):
+def display_df(df, columns=None, max_rows=None, height=360):
     show = pretty_df(df, columns=columns, max_rows=max_rows)
-    st.dataframe(show, use_container_width=True, hide_index=True)
+    st.dataframe(show, use_container_width=True, hide_index=True, height=height)
 
 def safe_summary_get(summary, primary_key, fallback_key=None, default=0):
     try:
@@ -1558,11 +1579,17 @@ def chart_panel(fig):
 
 
 
-def render_html_table_card(df, title, subtitle="", columns=None, max_rows=6):
+def render_html_table_card(df, title, subtitle="", columns=None, max_rows=5):
     st.markdown(f"<div class='action-card'><div class='action-title'>{title}</div><div class='action-copy'>{subtitle}</div>", unsafe_allow_html=True)
     if df is None or len(df) == 0:
         st.info("No records available.")
         st.markdown("</div>", unsafe_allow_html=True)
+        return
+    view = pretty_df(df, columns=columns, max_rows=max_rows).fillna("")
+    html = view.to_html(index=False, escape=False)
+    html = html.replace('border="1"', '')
+    st.markdown(f"<div class='html-table-wrap'>{html}</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
         return
     view = df.copy().head(max_rows)
     if columns:
@@ -1755,7 +1782,7 @@ def heatmap_chart(df, x, y, z, title):
             z=temp.values,
             x=list(temp.columns),
             y=list(temp.index),
-            colorscale=[[0, "#132031"], [0.25, "#203149"], [0.5, "#3a5677"], [0.75, "#7e96b3"], [1, "#dfe8f6"]],
+            colorscale=[[0, "#102033"], [0.25, "#18304b"], [0.5, "#24486f"], [0.75, "#4f7aa6"], [1, "#8bb8df"]],
             hoverongaps=False,
             text=np.round(temp.values, 1),
             texttemplate="%{text}",
@@ -1935,7 +1962,7 @@ if run_clicked:
         )
 
         # KPI ROW
-        k1, k2, k3, k4, k5 = st.columns(5)
+        k1, k2, k3, k4, k5 = st.columns(5, gap="medium")
         with k1:
             metric_card("Retail Health", f"{summary['retail_health_score']}", summary["retail_health_label"])
         with k2:
@@ -1948,11 +1975,11 @@ if run_clicked:
             metric_card("Accepted Rows", f"{int(summary['rows_accepted']):,}", f"Return impact {summary['return_impact_score']}%")
 
         st.markdown("### Executive Narrative")
-        left, right = st.columns([1.4, 1])
+        left, right = st.columns([1.25, 1], gap="large")
 
         with left:
             st.markdown("<div class='ai-box'>", unsafe_allow_html=True)
-            st.markdown("**Insights Summary**")
+            st.markdown("<div class='exec-card-title'>Insights Summary</div>", unsafe_allow_html=True)
             if len(ai_insights):
                 cleaned_points = []
                 for _, row in ai_insights.head(6).iterrows():
@@ -1969,8 +1996,8 @@ if run_clicked:
 
         with right:
             st.markdown("<div class='panel'>", unsafe_allow_html=True)
-            st.markdown("<div class='section-title'>Operational Integrity Snapshot</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='small-note'>Rows uploaded <b>{int(summary['rows_uploaded']):,}</b> · accepted <b>{int(summary['rows_accepted']):,}</b> · rejected <b>{int(summary['rows_rejected']):,}</b></div>", unsafe_allow_html=True)
+            st.markdown("<div class='exec-card-title'>Operational Integrity Snapshot</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='exec-card-sub'>Rows uploaded <b>{int(summary['rows_uploaded']):,}</b> · accepted <b>{int(summary['rows_accepted']):,}</b> · rejected <b>{int(summary['rows_rejected']):,}</b></div>", unsafe_allow_html=True)
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
             st.markdown(f"{status_badge(f'{fail_count} failures', 'risk')} &nbsp; {status_badge(f'{warn_count} warnings', 'warn')} &nbsp; {status_badge(f'{quality_label} quality', 'good' if fail_count == 0 else 'warn')}", unsafe_allow_html=True)
             st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
@@ -2047,23 +2074,23 @@ if run_clicked:
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
         # ACTION PANELS
-        st.markdown("### Commercial Actions")
+        st.markdown("### Action Center")
         a1, a2 = st.columns(2)
         with a1:
             render_html_table_card(
                 recommendations,
                 "Recommendations",
-                "Priority actions translated into a cleaner commercial readout.",
+                "Top recommended moves based on the strongest revenue, growth, and shelf signals.",
                 columns=["recommended_action"],
-                max_rows=6
+                max_rows=5
             )
         with a2:
             render_html_table_card(
                 sell_in,
                 "Sell-In Opportunities",
-                "Whitespace and sell-in opportunities with cleaner rationale and store-level callouts when available.",
+                "Highest-potential placement opportunities with retailer context and store-level callouts where available.",
                 columns=["priority", "retailer", "sku_or_brand", "action", "rationale"],
-                max_rows=6
+                max_rows=5
             )
 
 
@@ -2263,7 +2290,7 @@ if run_clicked:
                 cols = [c for c in yoy.columns if c in [
                     "sku_id", "brand", "category", "yoy_sales_growth_pct", "yoy_units_growth_pct", "exception_flags"
                 ] or c.startswith("sales_") or c.startswith("units_")]
-                display_df(yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last"), columns=cols)
+                display_df(yoy.sort_values("yoy_sales_growth_pct", ascending=False, na_position="last"), columns=cols, height=420)
             else:
                 st.info("Not enough history for YoY analysis.")
 
@@ -2287,6 +2314,9 @@ if run_clicked:
                     mix = momentum.groupby("momentum_flag", dropna=False).size().reset_index(name="count")
                     fig = bar_chart(mix, "momentum_flag", "count", "Momentum Signal Mix", top_n=10, horizontal=True)
                     if fig:
+                        fig.update_xaxes(title_text="")
+                        fig.update_yaxes(title_text="")
+                        fig.update_layout(showlegend=False)
                         chart_panel(fig)
                 headline = "Momentum signals show where recent velocity is accelerating or cooling."
                 what = f"Best momentum signal is {safe_top_value(momentum, 'momentum_ratio', ascending=False, label_cols=['brand', 'sku_id'])}."
@@ -2296,7 +2326,7 @@ if run_clicked:
                 cols = [c for c in [
                     "sku_id", "brand", "category", "velocity_13w", "velocity_52w", "momentum_ratio", "momentum_flag"
                 ] if c in momentum.columns]
-                display_df(momentum.sort_values("momentum_ratio", ascending=False, na_position="last"), columns=cols)
+                display_df(momentum.sort_values("momentum_ratio", ascending=False, na_position="last"), columns=cols, height=360)
             else:
                 st.info("Momentum could not be calculated.")
 
@@ -2356,8 +2386,11 @@ if run_clicked:
                     if fig:
                         chart_panel(fig)
                 with c2:
-                    fig = scatter_chart(shelf_df, "facings", "total_sales", "Facings vs. Sales Productivity", color="retailer", hover_name="sku_id", size="space_efficiency_index")
+                    shelf_action_view = shelf_df.groupby("shelf_action", dropna=False)["space_efficiency_index"].mean().reset_index().sort_values("space_efficiency_index", ascending=False)
+                    fig = bar_chart(shelf_action_view, "shelf_action", "space_efficiency_index", "Average Productivity by Shelf Action", top_n=10, horizontal=True)
                     if fig:
+                        fig.update_xaxes(title_text="Average Space Efficiency Index")
+                        fig.update_yaxes(title_text="")
                         chart_panel(fig)
                 headline = "Shelf productivity highlights where space can work harder."
                 what = f"Strongest opportunity is {safe_top_value(shelf_df, 'space_efficiency_index', ascending=False, label_cols=['retailer', 'sku_id'])}."
@@ -2369,7 +2402,7 @@ if run_clicked:
                     "total_sales", "total_units", "shelf_productivity_score", "sales_per_facing",
                     "category_avg_sales_per_facing", "space_efficiency_index", "shelf_action", "exception_flags"
                 ] if c in shelf_df.columns]
-                display_df(shelf_df.sort_values("space_efficiency_index", ascending=False), columns=cols)
+                display_df(shelf_df.sort_values("space_efficiency_index", ascending=False), columns=cols, height=380)
             else:
                 st.info("No shelf file was uploaded, so shelf productivity and SEI were not calculated.")
         st.divider()
